@@ -7,7 +7,7 @@
  * ----------------------------------------------------------------------
  *
  * Software by Whirl-i-Gig (http://www.whirl-i-gig.com)
- * Copyright 2014-2015 Whirl-i-Gig
+ * Copyright 2014-2016 Whirl-i-Gig
  *
  * For more information visit http://www.CollectiveAccess.org
  *
@@ -208,6 +208,9 @@
 			if (!($t_table = $o_dm->getInstanceByTableNum($pn_table_num, true))) { return $pa_hits; }
 
 			$t_user = new ca_users($pn_user_id);
+			if ($t_user->canDoAction('is_administrator'))	{
+				return $pa_hits;
+			}
 			if (is_array($va_groups = $t_user->getUserGroups()) && sizeof($va_groups)) {
 				$va_group_ids = array_keys($va_groups);
 				$vs_group_sql = 'OR (ca_acl.group_id IN ('.join(',',$va_group_ids).'))';
@@ -215,15 +218,16 @@
 				$vs_group_sql = '';
 			}
 
-			$vs_search_tmp_table = $this->loadListIntoTemporaryResultTable($pa_hits, md5(rand(1,100000)));
+			//$vs_search_tmp_table = $this->loadListIntoTemporaryResultTable($pa_hits, md5(rand(1,100000)));
+			$row_list_ids = implode(",", $pa_hits );
 
 			// first get all items where user has an exception that grants him access.
 			// those trump everything and are definitely part of the result set
 			$qr_items = $this->opo_db->query($vs_sql = "
-				SELECT row_id
+				SELECT HIGH_PRIORITY row_id
 				FROM ca_acl
 				WHERE
-					row_id IN (SELECT * FROM {$vs_search_tmp_table})
+					row_id IN ({$row_list_ids})
 					AND table_num = ? AND access >= ?
 					AND ((ca_acl.user_id = ?) {$vs_group_sql})
 			", (int)$pn_table_num, (int)$pn_access, (int)$pn_user_id);
@@ -232,10 +236,10 @@
 			// then get all items that have sufficient global access on item-level,
 			// minus those with an exception that prevents the current user from accessing
 			$qr_items = $this->opo_db->query("
-				SELECT row_id
+				SELECT HIGH_PRIORITY row_id
 				FROM ca_acl
 				WHERE
-					row_id IN (SELECT row_id FROM {$vs_search_tmp_table})
+					row_id IN ({$row_list_ids})
 					AND table_num = ? AND user_id IS NULL AND group_id IS NULL AND access >= ?
 					AND row_id NOT IN (
 						SELECT row_id FROM ca_acl
@@ -249,21 +253,18 @@
 
 			// If requested access is less restrictive than default access,
 			// add items with no ACL that don't have an exception for this user and his groups
-			if ($pn_access <= $o_conf->get('default_item_access_level')) {
-				// Find records with default ACL for this user/group
-				$qr_sort = $this->opo_db->query("
-					SELECT {$vs_search_tmp_table}.row_id
-					FROM {$vs_search_tmp_table}
-					LEFT JOIN (SELECT * FROM ca_acl WHERE ((ca_acl.user_id = ?) {$vs_group_sql}) OR (ca_acl.user_id IS NULL)) AS ca_acl ON {$vs_search_tmp_table}.row_id = ca_acl.row_id AND ca_acl.table_num = ?
-					WHERE
-						ca_acl.row_id IS NULL
-				", array($pn_user_id, (int)$pn_table_num));
+			// if ($pn_access <= $o_conf->get('default_item_access_level')) {
+			// 	// Find records with default ACL for this user/group
+			// 	$qr_sort = $this->opo_db->query("
+			// 		SELECT ca_acl.row_id 
+			// 		FROM ca_acl INNER JOIN {$t_table->tableName()} ON ({$t_table->tableName()}.{$t_table->primaryKey()} = ca_acl.row_id)
+			// 		WHERE ca_acl.row_id NOT IN ({$row_list_ids}) AND ((ca_acl.user_id = ?) {$vs_group_sql} OR (ca_acl.user_id IS NULL)) AND ca_acl.table_num = ? AND {$t_table->tableName()}.deleted = 0		
+			// 	", array($pn_user_id, (int)$pn_table_num));
 
-				$va_hits = array_merge($va_hits, $qr_sort->getAllFieldValues('row_id'));
-			}
+			// 	$va_hits = array_merge($va_hits, $qr_sort->getAllFieldValues('row_id'));
+			// }
 
 			$this->cleanupTemporaryResultTable();
-
 			return array_values(array_unique($va_hits));
 		}
 		# ------------------------------------------------------------------
@@ -494,7 +495,7 @@
 				//
 				$vs_sort_tmp_table = $this->loadListIntoTemporaryResultTable($pa_hits, caGenerateGUID(), array('sortableValues' => $pa_sortable_values));
 				$vs_sql = "
-					SELECT row_id
+					SELECT HIGH_PRIORITY row_id
 					FROM {$vs_sort_tmp_table}
 					ORDER BY sort_key1 {$ps_direction}, sort_key2 {$ps_direction}, sort_key3 {$ps_direction}, row_id
 				";
@@ -560,17 +561,13 @@
 				case __CA_ATTRIBUTE_VALUE_MOVEMENTS__:
 				case __CA_ATTRIBUTE_VALUE_STORAGELOCATIONS__:
 				case __CA_ATTRIBUTE_VALUE_OBJECTLOTS__:
-					if (!($vs_sortable_value_fld = Attribute::getSortFieldForDatatype($vn_datatype))) {
-						break;
-					}
-
 					if (!($t_auth_instance = AuthorityAttributeValue::elementTypeToInstance($vn_datatype))) { break; }
-
+					$vs_sortable_value_fld = $t_auth_instance->getLabelSortField();
 					$vs_sql = "
 							SELECT attr.row_id, lower(lil.{$vs_sortable_value_fld}) {$vs_sortable_value_fld}
 							FROM ca_attributes attr
 							INNER JOIN ca_attribute_values AS attr_vals ON attr_vals.attribute_id = attr.attribute_id
-							INNER JOIN ".$t_auth_instance->getLabelTableName()." AS lil ON lil.value_integer1 = attr_vals.item_id
+							INNER JOIN ".$t_auth_instance->getLabelTableName()." AS lil ON lil.".$t_auth_instance->primaryKey()." = attr_vals.item_id
 							WHERE
 								(attr_vals.element_id = ?) AND
 								(attr.table_num = ?) AND

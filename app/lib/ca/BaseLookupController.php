@@ -68,7 +68,7 @@
 			$o_search_config = caGetSearchConfig();
 				
 			if (!$this->ops_search_class) { return null; }
-			$ps_query = $this->request->getParameter('term', pString);
+			$ps_query = "name:".$this->request->getParameter('term', pString);
 			
 			$pb_exact = $this->request->getParameter('exact', pInteger);
 			$ps_exclude = $this->request->getParameter('exclude', pString);
@@ -170,10 +170,16 @@
 					$vs_search = trim($ps_query).(intval($pb_exact) ? '' : '*');
 				}
 				
-				$qr_res = $o_search->search($vs_search);
+				$qr_res = $o_search->search($vs_search, array('search_source' => 'Lookup', 'no_cache' => false, 'sort' => $vs_sort));
+				// $qr_res = $o_search->search($vs_search);
 				
 				$qr_res->setOption('prefetch', $pn_limit);
 				$qr_res->setOption('dontPrefetchAttributes', true);
+
+                // Promemoria
+                if (substr($ps_query, 0, 5) == 'name:') {
+                  $ps_query = substr($ps_query, 5);
+                }
 				
 				$va_opts = array('exclude' => $va_excludes, 'limit' => $pn_limit, 'request' => $this->getRequest());
 				if(!$pb_no_inline && ($pb_quickadd || (!strlen($pb_quickadd) && $this->request->user && $this->request->user->canDoAction('can_quickadd_'.$this->opo_item_instance->tableName()) && !((bool) $o_config->get($this->opo_item_instance->tableName().'_disable_quickadd'))))) {

@@ -35,6 +35,7 @@ require_once(__CA_APP_DIR__.'/helpers/utilityHelpers.php');
 require_once(__CA_LIB_DIR__.'/ca/BundlableLabelableBaseModelWithAttributes.php');
 require_once(__CA_MODELS_DIR__.'/ca_users.php');
 require_once(__CA_MODELS_DIR__.'/ca_user_groups.php');
+require_once(__CA_LIB_DIR__.'/core/Plugins/SearchEngine/ElasticSearch.php');
 
 class Installer {
 	# --------------------------------------------------
@@ -283,7 +284,6 @@ class Installer {
 		$va_media_volumes = $o_media_volumes->getAllVolumeInformation();
 
 		$vs_base_dir = $o_config->get('ca_base_dir');
-		$va_dir_creation_errors = array();
 		foreach($va_media_volumes as $vs_label => $va_volume_info) {
 			if (preg_match('!^'.$vs_base_dir.'!', $va_volume_info['absolutePath'])) {
 				if (!self::createDirectoryPath($va_volume_info['absolutePath'])) {
@@ -293,11 +293,9 @@ class Installer {
 			}
 		}
 
-		// nuke search index if we using ElasticSearch (the SqlSearch index is nuked when we drop the database)
 		if ($o_config->get('search_engine_plugin') == 'ElasticSearch') {
-			require_once(__CA_LIB_DIR__.'/core/Plugins/SearchEngine/ElasticSearch.php');
 			$o_es = new WLPlugSearchEngineElasticSearch();
-			$o_es->truncateIndex(null);
+			$o_es->truncateIndex();
 		}
 
 		return true;
@@ -306,9 +304,9 @@ class Installer {
 	public function performPostInstallTasks() {
 		$o_config = Configuration::load();
 		if ($o_config->get('search_engine_plugin') == 'ElasticSearch') {
-			require_once(__CA_LIB_DIR__.'/core/Plugins/SearchEngine/ElasticSearch.php');
-			$o_es = new WLPlugSearchEngineElasticSearch();
-			$o_es->refreshMapping(true);
+			$o_si = new SearchIndexer();
+			$o_si->reindex(null, array('showProgress' => false, 'interactiveProgressDisplay' => false));
+			CompositeCache::flush();
 		}
 	}
 	# --------------------------------------------------

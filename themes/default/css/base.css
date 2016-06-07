@@ -12,6 +12,10 @@ html, body {
     height: 100%;
 }
 
+#mainContent input:not([type="image" i]), textarea {
+    box-sizing: initial!important;
+}
+
 form{
     display:inline;
 }
@@ -587,11 +591,11 @@ div.inspectorCheckedOut {
     left: 0px;
     margin-left: auto;
     margin-right: auto;
-    background-color:#444;
+    background-color:#106A2F!important;
 }
 
 #footer{
-    background-color: #444;
+    background-color: #106A2F!important;
     width:1000px;
     color: #fff;
     font-size: 11px;
@@ -1169,13 +1173,13 @@ div.hint {
 	
     font-family: "DIN-Regular", sans-serif;
     font-size:13px;
-    color: #333;
+    color: #FFF;
     margin-bottom: 10px;
     padding-top: 5px;
     font-weight: bold;
     text-align: left;
-    background-color:#ededed;
-    border: 2px solid #ededed;
+    background-color:#619B3B;
+    /* border: 2px solid #ededed; */
     -moz-border-radius-topleft: 4px;
     -webkit-border-top-left-radius: 4px;
     -moz-border-radius-topright: 4px;
@@ -1207,7 +1211,7 @@ div.hint {
 .bundleContentPreview {
 	text-align:left;
 	display:inline-block;
-	color:#888888;
+	color: #FFF;
 	font-family: helvetica, sans-serif;
 	font-weight:normal;
 	font-size:13px;
@@ -1282,6 +1286,7 @@ div.hint {
 	text-transform:uppercase;
 	text-align: left;
 	width:30%;
+    overflow: hidden;
 	display:inline-block;
 	font-weight:bold;
 	color: #666;
@@ -1890,6 +1895,7 @@ div.search-hier-browser-box {
     background-color: #fbfbfb;
     border: 0px solid #e6e6e6;
     padding-left:0px;
+    color: #000;
 }
 
 .labelInfo {
@@ -3247,6 +3253,7 @@ input[type="text"], input[type="textarea"], textarea,  input[type="password"] {
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
+    box-sizing: inherit!important;
 }
 
 input[type="text"]:disabled, input[type="textarea"]:disabled, textarea:disabled {
@@ -4604,6 +4611,7 @@ div.bundleDisplayPlacementEditorContainer {
 }
 
 .bundleDisplayPlacementEditor {
+    color: #000;
     padding: 0px;
 }
 
@@ -6849,4 +6857,15 @@ div.authorityReferenceListContainer {
 	background-color: #fff;
 	border-radius: 10px;
 	border: 1px solid #cccccc;
+}
+
+
+/*Promemoria*/
+.recordTitle {
+    font-size: 24px;
+    color: #53C5D5;
+}
+
+.bundleLabel a img {
+    margin-top: 3px;
 }

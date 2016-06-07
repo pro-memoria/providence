@@ -153,6 +153,8 @@
 		} else {
 			jQuery('#caSideNavMoreToggle').hide();
 		}
+		// Hide precent search
+		jQuery('input[name="search"]').val('');
 	});
 	</script>
 <?php

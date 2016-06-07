@@ -137,7 +137,7 @@ class SearchEngine extends SearchBase {
 	public function doSearch($ps_search, $po_result=null, $pa_options=null) {
 		$t = new Timer();
 		global $AUTH_CURRENT_USER_ID;
-		
+
 		if ($vs_append_to_search = (isset($pa_options['appendToSearch'])) ? ' '.$pa_options['appendToSearch'] : '') {
 			$ps_search .= $vs_append_to_search;
 		}
@@ -164,6 +164,7 @@ class SearchEngine extends SearchBase {
 		// Process suffixes list... if search conforms to regex then we append a suffix.
 		// This is useful, for example, to allow auto-wildcarding of accession numbers: if the search looks like an accession regex-wise we can append a "*"
 		//
+				
 		$va_suffixes = $this->opo_search_config->getAssoc('search_suffixes');
 		if (is_array($va_suffixes) && sizeof($va_suffixes) && (!preg_match('!"!', $ps_search))) {		// don't add suffix wildcards when quoting
 			foreach($va_suffixes as $vs_preg => $vs_suffix) {
@@ -190,8 +191,7 @@ class SearchEngine extends SearchBase {
 			if((time() - $vn_created_on) < $vn_cache_timeout) {
 				Debug::msg('SEARCH cache hit for '.$vs_cache_key);
 				$va_hits = $o_cache->getResults();
-				
-				
+							
 				if ($vs_sort != '_natural') {
 					$va_hits = $this->sortHits($va_hits, $this->ops_tablename, $vs_sort, $vs_sort_direction);
 				} elseif (($vs_sort == '_natural') && ($vs_sort_direction == 'desc')) {
@@ -213,7 +213,9 @@ class SearchEngine extends SearchBase {
 			$o_query_parser->setEncoding($vs_char_set);
 			$o_query_parser->setDefaultOperator(LuceneSyntaxParser::B_AND);
 			
-			$ps_search = preg_replace('![\']+!', '', $ps_search);
+			//$ps_search = preg_replace('![\']+!', '', $ps_search);
+			//Promemoria
+			str_replace("'", "\u0027", $ps_search);
 			try {
 				$o_parsed_query = $o_query_parser->parse($ps_search, $vs_char_set);
 			} catch (Exception $e) {
@@ -223,13 +225,14 @@ class SearchEngine extends SearchBase {
 				} catch (Exception $e) {
 					$o_parsed_query = $o_query_parser->parse("", $vs_char_set);
 				}
-			}
+			}			
 			
 			$va_rewrite_results = $this->_rewriteQuery($o_parsed_query);
 			$o_rewritten_query = new Zend_Search_Lucene_Search_Query_Boolean($va_rewrite_results['terms'], $va_rewrite_results['signs']);
 
 			$vs_search = $this->_queryToString($o_rewritten_query);
 			//print "<div style='background:#FFFFFF; padding: 5px; border: 1px dotted #666666;'><strong>DEBUG: </strong>".$ps_search.'/'.$vs_search."</div>";
+			
 
 			// Filter deleted records out of final result
 			if ((isset($pa_options['deletedOnly']) && $pa_options['deletedOnly']) && $t_table->hasField('deleted')) {

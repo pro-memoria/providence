@@ -50,6 +50,13 @@
 	<div class="sectionBox">
 <?php
 
+/*
+Promemoria Luca Montanera
+ */
+$this->setVar( 'request', $this->opo_request );
+$this->setVar( 'user', $this->opo_request->user);
+print $this->render("widget_object_hierarchy_html.php", true);
+
 			print caFormTag($this->request, 'Save/'.$this->request->getActionExtra().'/object_id/'.$vn_object_id, 'ObjectEditorForm', null, 'POST', 'multipart/form-data');
 		
 			$va_bundle_list = array();
