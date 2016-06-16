@@ -1,6 +1,6 @@
 /nbproject/*
 /app/tmp/*
-!app/conf/local/*
+app/conf/local/*
 setup.php
 /media/*
 !/media/.htaccess
