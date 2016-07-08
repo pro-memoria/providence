@@ -1,0 +1,513 @@
+.navBreadCrumbContainer {
+    display: none;
+}
+
+#archiuitree {
+    margin-bottom: 50px;
+}
+
+.cutted {
+    border: 2px dashed #2D6F32;
+}
+
+#leftNavSidebar h1  {
+    width: 70%;
+    margin: 5px 0px 5px 20px;
+    font-weight: bold;
+    font-size: 1.5em;
+}
+#infoSelezionati {
+    width: 90%;
+    margin: 0 auto;
+    font-size: smaller;
+}
+
+#infoSelezionati ol.select-list {
+    padding: 0px;
+    list-style: none;
+}
+
+.jstree-proton .treenode-cont.jstree-clicked {
+    border-top-color: white;
+    border-radius: 0;
+}
+
+#infoSelezionati ol.select-list li {
+    margin: 5px 0;
+}
+
+#infoSelezionati .text {
+    color: #008B11;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#infoSelezionati .deseleziona {
+    font-size: 9px;
+    margin-left: 10%;
+    display: none;
+}
+
+.treenode-cont:hover .type, .jstree-clicked .type {
+    display: none;
+}
+
+.action {
+    width: 70%;
+    padding: 3%;
+    margin: 5px 0px 5px 20px;
+    background-color: #e6e6e6;
+    color: #000;
+    cursor: pointer;
+}
+
+.action span {
+    display: inline-block;
+    width: 75%;
+    margin-left: 5px;
+    vertical-align: middle;
+    font-size: smaller;
+}
+
+.action i.fa {
+    width: 15%;
+    vertical-align: middle;
+}
+
+.action:hover   {
+    color: #FFF;
+    background-color: #5e5e5e;
+}
+
+.disable {
+    border: 1px dashed #e6e6e6;
+    cursor: initial;
+    opacity: 0.2;
+    pointer-events: none;
+}
+.disable:hover {
+    background-color: #e6e6e6!important;
+    color: #000!important;
+    opacity: 0.2;
+}
+
+
+#btnSalva {
+    background-color: #209B5A;
+    text-transform: uppercase;
+    color: #FFF;
+}
+
+#btnSalva:hover {
+    background-color: #209B5A;
+    color: #FFF;
+}
+
+.jstree-container-ul > li > .treenode-cont .jstree-ocl {
+    display: none!important;
+}
+
+[data-notify="progressbar"] {
+    margin-bottom: 0px;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 5px;
+}
+
+[data-notify="container"][class*="alert-pastel-"] {
+    background-color: #209B5A;
+    border-width: 0px;
+    border-radius: 0px;
+    box-shadow: 5px 5px 5px rgba(51, 51, 51, 0.3);
+    letter-spacing: 1px;
+    padding: 2%;
+    width: 300px;
+
+}
+
+[data-notify="container"][class*="alert-pastel-"] > [data-notify="title"] {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #FFF;
+}
+[data-notify="container"][class*="alert-pastel-"] > [data-notify="message"] {
+    font-weight: 400;
+    color: #FFF;
+}
+
+[data-notify="icon"]   {
+    width: 15%;
+    vertical-align: top;
+    color: #FFF;
+}
+
+.noty-cont {
+    display: inline-block;
+    width: 80%;
+    color: #FFF;
+}
+
+.container {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000;
+    overflow: hidden;
+    opacity: 0.4;
+    color: white;
+}
+
+.modal {
+    position: fixed;
+    z-index: 1050;
+    top: 50%;
+    left: 60%;
+
+    display: none;
+
+    width: 60%;
+    height: auto;
+    max-height: 90vh;
+
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+
+    background-color: #FFF;
+    -moz-box-shadow: 2px 0 19px -4px rgba(229,229,229,0.75);
+    -webkit-box-shadow: 2px 0 19px -4px rgba(229,229,229,0.75);
+    box-shadow: 2px 0 19px -4px rgba(229,229,229,0.75);
+}
+
+.modal header {
+    width: 100%;
+    height: 35px;
+
+    background-color: #E6E6E6;
+
+    font-weight: bold;
+    line-height: 35px;
+}
+
+.modal header .title {
+    margin: 15px;
+}
+
+.modal header .close {
+    float: right;
+
+    margin: 0 15px;
+
+    cursor: pointer;
+}
+
+.modal article {
+    display: block;
+    overflow: auto;
+
+    height: 60vh;
+    padding: 0 5%;
+}
+
+.modal footer {
+    position: relative;
+    bottom: 0;
+
+    border-top: 1px solid #E5E5E5;
+}
+
+.modal footer .form-button {
+    float: right;
+
+    margin: 2% 5px;
+}
+
+.modal footer #caRipristina, .modal footer #caSave {
+    float: left;
+}
+
+.modal footer a#caRipristina {
+    margin-left: 5%;
+}
+
+.modal footer span.form-button {
+    min-height: 25px;
+    margin: 0;
+    padding: 8px 20px 0 10px;
+
+    color: #FFF;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    background-color: #06B86F;
+}
+.modal footer span.form-button img {
+    width: 25px;
+    margin-top: -3px;
+}
+
+.modal footer #caSave span.form-button, .modal footer #caRipristina span.form-button {
+    margin: 0;
+
+    background-color: #5D5D5D;
+}
+
+input[type='radio'], input[type='checkbox'] {
+    cursor: pointer;
+}
+
+input[type='radio']:after, input[type='checkbox']:after {
+    position: relative;
+    top: -2px;
+    left: -2px;
+
+    display: inline-block;
+    visibility: visible;
+
+    width: 16px;
+    height: 16px;
+
+    content: '';
+
+    -moz-border-radius: 16px;
+    border-radius: 16px;
+    background-color: #d1d3d1;
+}
+
+input[type='radio']:checked:after, input[type='checkbox']:checked:after {
+    position: relative;
+    top: -2px;
+    left: -2px;
+
+    display: inline-block;
+    visibility: visible;
+
+    width: 16px;
+    height: 16px;
+
+    content: '';
+
+    -moz-border-radius: 16px;
+    border-radius: 16px;
+    background-color: #209B5A;
+}
+
+.modal-backdrop {
+    position: fixed;
+    z-index: 1040;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    display: none;
+
+    opacity: .7;
+    background-color: #000000;
+
+    filter: alpha(opacity=70);
+}
+
+ul {
+    list-style: none;
+}
+
+ul li {
+    margin: 4% 0;
+}
+
+ul li select {
+    float: right;
+}
+
+#modal-inventory #caInventary ul {
+    list-style: none;
+}
+
+#modal-inventory #caInventary ul li {
+    margin: 4% 0;
+}
+
+#modal-inventory #caInventary ul li select {
+    float: right;
+}
+
+.tipologia3 {
+    display: inline-block;
+
+    width: 100%;
+    margin-top: 5%;
+}
+
+.tipologia3 span {
+    display: inline-block;
+
+    width: 55%;
+    margin-right: 23%;
+}
+
+.tipologia3 .option {
+    display: none;
+}
+
+ul.tabs {
+    position: absolute;
+    top: 60vh;
+    left: 0;
+
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+
+    width: 100%;
+    height: 35px;
+    margin: 0;
+    padding: 0;
+
+    list-style-type: none;
+}
+ul.tabs li {
+    margin: 0;
+
+    cursor: pointer;
+    text-align: center;
+
+    color: #000;
+    border-left: 2px solid white;
+    background-color: #dedbde;
+
+    font-weight: bold;
+    line-height: 35px;
+
+    -webkit-box-flex: 1;
+    -ms-box-flex: 1;
+    -webkit-flex: 1;
+    -moz-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+}
+
+ul.tabs li:hover {
+    color: #FFF;
+    background-color: #5e5e5e;
+}
+ul.tabs .selected {
+    background-color: #FFF;
+}
+.hide { display: none; }
+
+.metadati {
+    margin: 25px 0;
+}
+
+.type_id {
+    padding-right: 8px;
+}
+
+.type_id .title {
+    float: left;
+
+    font-weight: bold;
+}
+
+.type_id input[type="checkbox"] {
+    float: right;
+}
+
+.clear {
+    clear: both;
+}
+
+.metadata-list {
+    padding: 0;
+    margin: 3px 0 5px 0;
+}
+
+.metadato {
+    margin: 0;
+    padding: 8px;
+
+    border: 1px solid #E9E9E9;
+}
+
+.metadato .dnd  {
+    margin-left: 5px;
+
+    cursor: pointer;
+
+    color: #E9E9E9;
+
+    font-size: larger;
+}
+
+.metadato .controls {
+    float: right;
+    display: inline-block;
+}
+
+#modal-ordinatore select {
+    width: 100%;
+    font-size: 12px;
+    /*height: 34px;*/
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 1px solid #E9E9E9;
+    border-radius: 0;
+    padding: 10px 5px;
+    background: url('https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_keyboard_arrow_down_48px-128.png') 99% / 3% no-repeat;
+}
+
+#modal-ordinatore article {
+    padding-bottom: 55px;
+}
+
+#modal-ordinatore .metadato .label {
+    vertical-align: top;
+}
+
+option[default] {
+    color: #5D5D5D;
+}
+
+.addTypeInput  {
+    display: inline-block;
+    margin: 0 5%;
+}
+
+.addTypeInput select {
+    width: auto;
+    background-size: 13%;
+}
+
+.tipologia3 .tipologia3Select:checked + .option  {
+    display: inline-block;
+}
+
+#modal-rinumera article {
+    padding: 0 5%;
+}
+
+#modal-rinumera .input {
+    margin: 1.5%;
+}
+
+#modal-rinumera .input input {
+    margin: 0 16px;
+}
+
+#modal-ordinatore .twotype {
+    margin-left: 25%;
+    font-size: small;
+}
+
+#modal-ordinatore .twotype input[name='TwoType']:after {
+    top: -8px;
+}
