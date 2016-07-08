@@ -149,7 +149,7 @@ $administrator = $user->canDoAction( "is_administrator" );
 
         var promemoria = $("#promemoria");
         promemoria.jstree({
-            "plugins": ["dnd", "search", "state", "types"],
+            "plugins": ["search", "state", "types"],
             "core" : {
                 "animation" : 0,
                 "check_callback" : true,

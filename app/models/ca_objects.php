@@ -291,6 +291,13 @@ BaseModel::$s_ca_models_definitions['ca_objects'] = array(
 				'DEFAULT' => '',
 				'LABEL' => _t('Sort order'), 'DESCRIPTION' => _t('Sort order'),
 		),
+		'ordine' => array(
+				'FIELD_TYPE' => FT_NUMBER, 'DISPLAY_TYPE' => DT_FIELD, 
+				'DISPLAY_WIDTH' => 10, 'DISPLAY_HEIGHT' => 1,
+				'IS_NULL' => true, 
+				'DEFAULT' => '',
+				'LABEL' => _t('Order'), 'DESCRIPTION' => _t('The order in the hierarchy'),
+		),
 		'acl_inherit_from_ca_collections' => array(
 				'FIELD_TYPE' => FT_NUMBER, 'DISPLAY_TYPE' => DT_SELECT, 
 				'DISPLAY_WIDTH' => 100, 'DISPLAY_HEIGHT' => 1,
