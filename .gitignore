@@ -14,6 +14,7 @@ setup.php
 *.swp
 .vagrant/
 /import/*
+!/import/TemplateInventario.docx
 /vendor/ezyang/htmlpurifier/library/HTMLPurifier/DefinitionCache/Serializer/*
 !vendor/ezyang/htmlpurifier/library/HTMLPurifier/DefinitionCache/Serializer/.keep
 /app/lib/core/Parsers/dompdf/lib/fonts/*fm.php

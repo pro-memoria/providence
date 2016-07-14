@@ -130,10 +130,10 @@ class StrumentiController extends ActionController {
               SELECT t.object_id as id, t.parent_id,t.type_id as type, l.name as text, (SELECT COUNT(*) FROM ca_objects p WHERE t.object_id = p.parent_id) hasChildren
               FROM (ca_objects t INNER JOIN ca_object_labels l ON (t.object_id=l.object_id)) INNER JOIN ca_acl ON (ca_acl.row_id = t.object_id AND ca_acl.table_num = 57)
               WHERE deleted = 0 AND (ca_acl.user_id = {$user->getUserID()} ";
-              $user_groups = $user->getGroupList();
-              if (!empty($user_groups)) {
-                $query .= "OR ca_acl.group_id IN (". array_keys($user_groups) .")";
-              }
+              $user_groups = $user->getUserGroups();
+                if (!empty($user_groups)) {
+                  $query .= "OR ca_acl.group_id IN (". implode(",", array_keys($user_groups)) .")";
+                }
               $query .= ") AND l.is_preferred = 1 AND ";
         }
         if ($_POST['id'] == "0") {
