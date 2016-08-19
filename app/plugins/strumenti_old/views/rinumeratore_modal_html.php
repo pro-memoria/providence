@@ -5,8 +5,6 @@
  * Date: 23/05/16
  * Time: 12:14
  */
-
-$menu = $this->getVar('menu_rinumeratore');
 ?>
 
 <div id="modal-rinumera" class="modal">
@@ -21,26 +19,25 @@ $menu = $this->getVar('menu_rinumeratore');
     <article>
         <section>
             <h3>Opzioni di rinumerazione</h3>
-            <select name="type">
-                <?php foreach ($menu as $key => $value) {?>
-                    <option value="<?php echo $key; ?>"><?php echo $value['label']; ?></option>
-                <?php } ?>
-            </select>
-            <?php foreach ($menu as $key => $value) {?>
-                <div id="<?php echo $key; ?>" class="rinum-options" style="display: none">
-                    <div class="input">
-                        <?php if (isset($value['options']['aperta'])) { ?>
-                            <input type="radio" name="<?php echo $value['label']; ?>" value="cascata" checked disabled> corda aperta
-                        <?php }?>
-                        <?php if (isset($value['options']['chiusa'])) { ?>
-                            <input type="radio" name="<?php echo $value['label']; ?>" value="chiusa" disabled> corda chiusa
-                        <?php }?>
-                    </div>
-                    <?php if (isset($value['romano'])) { ?>
-                        <div class="input"><input type="checkbox" name="romano" value="romano" disabled> numero romano</div>
-                    <?php }?>
-                </div>
-            <?php } ?>
+            <div class="input">Complessi Archivistici: <input type="radio" name="FONDI" value="cascata" checked> corda aperta</div>
+
+            <div class="input">Serie: <input type="radio" name="LIVELLI" value="cascata" checked> corda aperta<input type="radio"
+                                                                                                        name="LIVELLI"
+                                                                                                        value="romano">
+                numero romano
+            </div>
+
+            <div class="input">Unità archivistiche: <input type="radio" name="UNITA COMPLESSE" value="cascata" checked> corda aperta<input type="radio"
+                                                                                                        name="UNITA COMPLESSE"
+                                                                                                        value="chiusa">
+                corda chiusa
+            </div>
+
+            <div class="input">Unità documentarie: <input type="radio" name="UNITA SEMPLICI" value="cascata" checked> corda aperta<input type="radio"
+                                                                                                        name="UNITA SEMPLICI"
+                                                                                                        value="cascata">
+                corda chiusa
+            </div>
 
         </section>
         <section class="prefisso" style="display: none;">
@@ -70,8 +67,6 @@ $menu = $this->getVar('menu_rinumeratore');
     </form>
     <script>
         (function ($) {
-            $('#<?php echo reset(array_keys($menu)); ?>').show();
-            $("#<?php echo reset(array_keys($menu)); ?> .input input").prop('disabled', false);
             $('#modal-rinumera .form-button').click(function (e) {
                 disableExitControl = true;
                 $('input[name="function"]').val($(this).attr('id'));
@@ -87,15 +82,9 @@ $menu = $this->getVar('menu_rinumeratore');
                 } else {
                     $('input[name="fisso"]').prop('disabled', true);
                 }
-            });
-
-            $('select[name="type"]').change(function () {
-                $(".rinum-options").hide();
-                $(".rinum-options .input input").prop('disabled', true);
-                $('#' + $(this).attr('value')).show();
-                $('#' + $(this).attr('value') + " .input input").prop('disabled', false);
-            });
+            })
 
         })(jQuery)
     </script>
 </div>
+

@@ -96,7 +96,6 @@ class StrumentiController extends ActionController {
         $modal_ordinatore = $this->ausiliarView->render($this->plugin_path . 'views/ordinatore_modal_html.php');
 
         // Modale rinumeratore
-        $this->ausiliarView->setVar('menu_rinumeratore', $this->opo_config->get('rinumeratore_options'));
         $modal_rinumeratore = $this->ausiliarView->render($this->plugin_path . 'views/rinumeratore_modal_html.php');
 
         $this->view->setVar('albero', $albero);
@@ -132,9 +131,9 @@ class StrumentiController extends ActionController {
               FROM (ca_objects t INNER JOIN ca_object_labels l ON (t.object_id=l.object_id)) INNER JOIN ca_acl ON (ca_acl.row_id = t.object_id AND ca_acl.table_num = 57)
               WHERE deleted = 0 AND (ca_acl.user_id = {$user->getUserID()} ";
               $user_groups = $user->getUserGroups();
-              if (!empty($user_groups)) {
-                $query .= "OR ca_acl.group_id IN (". implode(",", array_keys($user_groups)) .")";
-              }
+                if (!empty($user_groups)) {
+                  $query .= "OR ca_acl.group_id IN (". implode(",", array_keys($user_groups)) .")";
+                }
               $query .= ") AND l.is_preferred = 1 AND ";
         }
         if ($_POST['id'] == "0") {
@@ -142,7 +141,8 @@ class StrumentiController extends ActionController {
         } else {
             $query .= "t.parent_id = " . $_POST['id'];
         }
-        $query .= " ORDER BY t.ordine";
+        $query .= " ORDER BY t.posizione, t.ordine";
+        file_put_contents("/var/www/polo900-dev.promemoriagroup.com/backend_csi/app/widgets/promemoriaTreeObject/ajax/debug.txt", $query);
         $qr_result = $this->o_db->query($query);
         $i = 0;
         $icons = $this->opo_config->get('icons');
@@ -359,9 +359,8 @@ class StrumentiController extends ActionController {
             $idPartenza = $options['object'];
             $numeroPartenza = intval($options['start']);
             $prefisso = $options['prefisso'];
-            $type = $options['type'];
 
-            unset($options['_formName'], $options['object'], $options['start'], $options['prefisso'], $options['type']);
+            unset($options['_formName'], $options['object'], $options['start'], $options['prefisso']);
 
             $params = array();
             foreach ($options as $key => $value)    {
@@ -370,7 +369,7 @@ class StrumentiController extends ActionController {
 
             $rinumeratore = new Rinumeratore($params);
 
-            $changeItem = $rinumeratore->run($idPartenza, $numeroPartenza, $prefisso, $type);
+            $changeItem = $rinumeratore->run($idPartenza, $numeroPartenza, $prefisso);
             foreach ($changeItem as $id => $item)   {
                 $this->transiction['UPDATE'][$id]['attr'] = $item;
             }

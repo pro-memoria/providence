@@ -124,7 +124,7 @@ class StampaInventario {
                 if ($object->getTypeID() == $types['Fondi'])    {
                     $currentSection->addPageBreak();
                 }
-		        $currentSection->addLine(array('weight' => 1, 'width' => 100, 'height' => 0, 'color' => 635552));
+		$currentSection->addLine(array('weight' => 1, 'width' => 100, 'height' => 0, 'color' => 635552));
             }
 
             $getChildren = $this->o_db->query("SELECT object_id FROM ca_objects WHERE parent_id = " . $currentObjId . " AND deleted = 0 ORDER BY ordine DESC, object_id DESC");

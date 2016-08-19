@@ -95,7 +95,7 @@ switch ( $operation ) {
         } else {
             $query .= "t.parent_id = " . $_GET['id'];
         }
-        $query .= " GROUP BY id, t.parent_id, type, t.posizione, text, date ";
+        $query .= " GROUP BY id ";
         $query .= " ORDER BY $order $verso";
         $qr_result = $o_db->query( $query );
         $i         = 0;
@@ -175,6 +175,9 @@ switch ( $operation ) {
                 case 280:
                     $icon = 'fa fa-folder icon-color';
                 break;
+                case 2565:
+                    $icon = 'fa fa-clone icon-color';
+                break;
             }
 
             $nodo->icon = $icon;
@@ -189,13 +192,18 @@ switch ( $operation ) {
             $num_def = "";
             $text = "";
             $metadataAttr = null;
-            if (isset($opo_config->users->$user_id))  {
-                $metadataAttr = $opo_config->users->$user_id;
-            } else if (isset($opo_config->groups)) {
-                foreach (explode(",", $user_groups) as $group_id) {
-                    if (isset($opo_config->groups->$group_id))
-                        $metadataAttr = $opo_config->groups->$group_id;
-                    break;
+            if ($user_id == 1 || $user_groups == 2 || in_array($user_groups, 2))    {
+                $metadataAttr = $opo_config->default;
+            } else {
+
+                if (isset($opo_config->users->$user_id))  {
+                    $metadataAttr = $opo_config->users->$user_id;
+                } else if (isset($opo_config->groups)) {
+                    foreach (explode(",", $user_groups) as $group_id) {
+                        if (isset($opo_config->groups->$group_id))
+                            $metadataAttr = $opo_config->groups->$group_id;
+                        break;
+                    }
                 }
             }
 
@@ -464,7 +472,7 @@ switch ( $operation ) {
                           FROM `ca_editor_uis`
                           WHERE `editor_code` = 'editor-schede'))
             AND `bundle_name` LIKE '%ca_attribute%' AND `ca_metadata_elements`.datatype != 22
-            GROUP BY name, code, datatype, id 
+            GROUP BY name
             ORDER BY name
 QUERY;
 

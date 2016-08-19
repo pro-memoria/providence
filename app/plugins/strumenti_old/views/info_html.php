@@ -46,9 +46,9 @@ $ajax_path = $this->getVar( 'root' ) . 'strumenti/Strumenti';
         <div id="btnOrdina" class="action disable" data-action="ord">
             <i class="fa fa-sort" aria-hidden="true"></i> <span>Ordina</span>
         </div>
-        <div id="btnRinumera" class="action disable" data-action="renum">
+        <!-- <div id="btnRinumera" class="action disable" data-action="renum">
             <i class="fa fa-sort-numeric-desc" aria-hidden="true"></i> <span>Rinumera</span>
-        </div>
+        </div> -->
         <div id="btnInventario" class="action disable" data-action="print">
             <i class="fa fa-print" aria-hidden="true"></i> <span>Stampa inventario</span>
         </div>
@@ -132,12 +132,12 @@ $ajax_path = $this->getVar( 'root' ) . 'strumenti/Strumenti';
         $('#modal-ordinatore .Formobject_id').val(archiuitree.jstree().get_selected());
     });
 
-    $('#btnRinumera').click(function (e)    {
-        $('#modal-rinumera').show();
-        $('.modal-backdrop').show();
+    // $('#btnRinumera').click(function (e)    {
+    //     $('#modal-rinumera').show();
+    //     $('.modal-backdrop').show();
 
-        $('#modal-rinumera .Formobject_id').val(archiuitree.jstree().get_selected());
-    });
+    //     $('#modal-rinumera .Formobject_id').val(archiuitree.jstree().get_selected());
+    // });
 
     $('#btnRifinisci').click(function (e) {
         var selected = archiuitree.jstree().get_selected();
