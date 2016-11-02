@@ -25,6 +25,8 @@ $exception_metadata = array(
     'internal_notes', // note di servizio
     'archivistnote', // note dell'archivista
     'ldc', // Collocazione specifica (ldc)
+    'azioni',
+    'id_origine'
 );
 
 $types_map = array(
@@ -38,19 +40,23 @@ $types_map = array(
     'bdm' => 'Oggetti',
     'bdm (aggregazione)' => 'Oggetti',
     'disegni' => 'Disegni',
+    'disegni (aggregazione)' => 'Disegni',
     'disegni d' => 'Disegni',
     'unità bibliografica bib' => 'Unità bibliografiche',
     'fototipo f' => 'Foto',
-    'fototipo (aggregazione)' => 'Foto',
+    'fototipi (aggregazione)' => 'Foto',
     'documento fotografico (bdi)' => 'Foto',
     'documento fotografico integrativo (fi)' => 'Foto',
     'stampe s' => 'Stampe',
-    'stampe (aggragazione)' => 'Stampe',
-    'documeno audio (bdi)' => 'Audio',
+    'stampe (aggregazione)' => 'Stampe',
+    'documento audio (bdi)' => 'Audio',
     'documento audio integrativo (ai)' => 'Audio',
     'scheda video' => 'Video',
-    'video (aggrafazione)' => 'Video',
+    'video (aggregazione)' => 'Video',
     'documento video-cinematografico integrativo (vi)' => 'Video',
     'documento video-cinematografico (bdi)' => 'Video',
-    'bdi (aggregazione)' =>'Insiemi di beni demoetnoantropologici immateriali'
+    'bdi (aggregazione)' =>'Insiemi di beni demoetnoantropologici immateriali',
+    'ente' => 'Ente',
+    'famiglia' => 'Famiglia',
+    'persona' => 'Persona'
 );

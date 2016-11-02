@@ -269,7 +269,7 @@
 		public static function rebuild_search_index($po_opts=null) {
 			require_once(__CA_LIB_DIR__."/core/Search/SearchIndexer.php");
 			#ini_set('memory_limit', '4000m');
-			set_time_limit(24 * 60 * 60 * 7); /* maximum indexing time: 7 days :-) */
+			#set_time_limit(24 * 60 * 60 * 7); /* maximum indexing time: 7 days :-) */
 
 			$o_si = new SearchIndexer();
 

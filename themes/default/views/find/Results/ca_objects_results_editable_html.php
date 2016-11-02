@@ -61,7 +61,7 @@
 	jQuery(document).ready(function() {
 		caResultsEditor = caUI.initTableView('#caResultsEditorGrid', {
 			initialData: <?php print json_encode(is_array($va_initial_data) ? $va_initial_data : array()); ?>,
-			rowCount: <?php print $vo_result->numHits(); ?>,
+//			rowCount: <?php print $vo_result->numHits(); ?>,
 			
 			dataLoadUrl: '<?php print caNavUrl($this->request, $this->request->getModulePath(), $this->request->getController(), "getPartialResult"); ?>',
 			dataSaveUrl: '<?php print caNavUrl($this->request, $this->request->getModulePath(), $this->request->getController(), "saveInlineEdit"); ?>',

@@ -76,7 +76,8 @@ function HandsontableScrollLoad() {
 							jQuery("." + settings.statusDisplayClassName).fadeOut(500);
 						}, 5000);
 						table.updateSettings({columnSorting: true});
-						table.render();
+                        table.loadData(data);
+					//	table.render();
 					}
 					isAutoloading = false;
 				});
@@ -142,7 +143,8 @@ function HandsontableScrollLoad() {
 				});
 				table.updateSettings({'rowHeaders': rowHeaders});
 				userIsLoading = false;
-				table.render();
+                table.loadData();
+				//table.render();
 			});
 		}
 	};

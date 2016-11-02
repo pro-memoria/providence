@@ -7,13 +7,20 @@
  */
 
 //Rinomino la variabile $_SERVER['SCRIPT_FILENAME'] perché punti alla corretta cartella per l'esecuzione di setup.php
+$base_path = dirname(dirname(dirname(dirname(dirname($_SERVER['SCRIPT_FILENAME'])))));
 $array                      = explode( "/", $_SERVER['SCRIPT_FILENAME'] );
 $_SERVER['SCRIPT_FILENAME'] = implode( "/", array_slice( $array, 0, count( $array ) - 4 ) );
 
-require( '../../../../setup.php' );
+require($base_path.'/setup.php');
 
 $o_db          = new Db( NULL, NULL, false );
-$opo_config = json_decode(file_get_contents(__CA_APP_DIR__ . '/widgets/promemoriaTreeObject/conf/promemoriaTreeObjectAttr.json' ));
+if (!file_exists(__CA_CACHE_FILEPATH__.'/promemoriaTreeObjectAttr.json'))    {
+    file_put_contents(__CA_CACHE_FILEPATH__.'/promemoriaTreeObjectAttr.json', json_encode(array(
+        'users' => array('metadata' => array(), 'summary' => 0),
+        'groups' => array('metadata' => array(), 'summary' => 0),
+        'default' => array('metadata' => array('preferred_label'), 'summary' => 0))));
+}
+$opo_config = json_decode(file_get_contents(__CA_CACHE_FILEPATH__.'/promemoriaTreeObjectAttr.json'));
 
 function saveChildren( $children, $parent_id = "null" ) {
     global $o_db;
@@ -25,6 +32,19 @@ function saveChildren( $children, $parent_id = "null" ) {
             saveChildren( $nodo->children, $id );
         }
     }
+}
+
+function getParentPath($id, $parent = array(), $o_db) {
+    $query = "SELECT parent_id FROM ca_objects WHERE deleted=0 AND object_id = {$id}";
+    $qr_result = $o_db->query($query);
+    $qr_result->nextRow();
+    $parent_id = $qr_result->get('parent_id');
+    if ($parent_id) {
+        $parent[] = $parent_id;
+        $parent = getParentPath($parent_id, $parent, $o_db);
+    }
+
+    return $parent;
 }
 
 
@@ -290,8 +310,9 @@ switch ( $operation ) {
         $o_db->commitTransaction();
         break;
     case "get_children_contestuale":
-        $user_id = empty( $_GET['user_id'] ) ? 1 : $_GET["user_id"];
-        $user_groups = empty( $_GET['user_groups'] ) ? null : $_GET["user_groups"];
+        $user_id = empty( $_POST['user_id'] ) ? 1 : $_POST["user_id"];
+        $user_groups = empty( $_POST['user_groups'] ) ? null : $_POST["user_groups"];
+        $current_id = empty( $_POST['current_id']) ? null : $_POST['current_id'];
 
         if ($user_groups == 2 || in_array($user_groups, 2)) {
             //query per recuperare gli oggetti
@@ -336,20 +357,31 @@ switch ( $operation ) {
             }
             $query .= "AND ca_acl.access IN (1, 2, 3) AND ";
         }
-        if ( $_GET['id'] == "0" ) {
+        if ( $_POST['id'] == "0" ) {
             $query .= "t.parent_id is null";
         } else {
-            $query .= "t.parent_id = " . $_GET['id'];
+            $query .= "t.parent_id = " . $_POST['id'];
         }
         $query .= " GROUP BY id ";
         $query .= " ORDER BY t.ordine, posizione ASC";
         $qr_result = $o_db->query( $query );
         $i         = 0;
         $o_db->beginTransaction();
+
+        $parent_path = getParentPath($current_id, array(), $o_db);
+
         while ( $qr_result->nextRow() ) {
             $nodo           = new stdClass();
             $nodo->id = $qr_result->get( "id" );
             $nodo->children = $qr_result->get("hasChildren")>0;
+
+            if (in_array($qr_result->get("id"), $parent_path)) {
+                $nodo->state = array("opened" => true);
+            }
+
+            if ($qr_result->get("id") == $current_id)   {
+                $nodo->state = array("selected" => true);
+            }
 
             $nome     = $qr_result->get( "text" );
             $type     = $qr_result->get( "type" );
@@ -543,7 +575,7 @@ QUERY;
         }
 
         //Modifico il file di configurazione in modo che al caricamento ricarichi le informazioni
-        file_put_contents( __CA_APP_DIR__ . '/widgets/promemoriaTreeObject/conf/promemoriaTreeObjectAttr.json', json_encode($opo_config));
+        file_put_contents( __CA_CACHE_FILEPATH__.'/promemoriaTreeObjectAttr.json', json_encode($opo_config));
         break;
     default:
         break;

@@ -49,14 +49,12 @@
 ?>
 	<div class="sectionBox">
 <?php
-
-/*
-Promemoria Luca Montanera
- */
-$this->setVar( 'request', $this->opo_request );
-$this->setVar( 'user', $this->opo_request->user);
-print $this->render("widget_object_hierarchy_html.php", true);
-
+// $this->setVar('request', $this->opo_request);
+// $this->setVar('user', $this->opo_request->user);
+			AssetLoadManager::register('treejs');
+			$this->setVar('user', $this->opo_request->user);
+			$this->setVar('current_id', $vn_object_id);
+			print $this->render("widget_object_hierarchy_html.php", true);
 			print caFormTag($this->request, 'Save/'.$this->request->getActionExtra().'/object_id/'.$vn_object_id, 'ObjectEditorForm', null, 'POST', 'multipart/form-data');
 		
 			$va_bundle_list = array();
@@ -86,7 +84,11 @@ print $this->render("widget_object_hierarchy_html.php", true);
 ?>
 		</form>
 	</div>
-
 	<div class="editorBottomPadding"><!-- empty --></div>
 	
 	<?php print caSetupEditorScreenOverlays($this->request, $t_object, $va_bundle_list); ?>
+
+<!-- Archiui -->
+<?php
+
+?>

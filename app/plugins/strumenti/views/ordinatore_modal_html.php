@@ -20,7 +20,7 @@ $menu = $this->getVar('template_ordinatore');
             Generico:
             <span class="option">
                 <input type="checkbox" name="TwoType" data-criterio="data" value="data"> Data
-                <input type="checkbox" name="TwoType" data-criterio="num" value="numero_definitivo"> Numero
+                <input type="checkbox" name="TwoType" data-criterio="num" value="numero_definitivo"> Numero Definitivo
             </span>
         </span>
         <span class="close"><i class="fa fa-times"></i></span>

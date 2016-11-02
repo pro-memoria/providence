@@ -34,7 +34,7 @@ var caUI = caUI || {};
 		var that = jQuery.extend({
 			container: container,
 			initialData: null,
-			rowCount: null,		// number of rows in result set to display
+		 //	rowCount: null,		// number of rows in result set to display
 			contextMenu: false,
 			columnSorting: true,
 			
@@ -238,7 +238,7 @@ var caUI = caUI || {};
 			editLinkFormat: that.editLinkFormat,
 			statusDisplayClassName: that.statusDisplayClassName,
 			
-			onChange: function (change, source) {
+			afterChange: function (change, source) {
 				if ((source === 'loadData') || (source === 'updateAfterRequest') || (source === 'external')) {
 				  return; //don't save this change
 				}

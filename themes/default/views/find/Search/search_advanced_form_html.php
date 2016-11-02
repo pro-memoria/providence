@@ -97,7 +97,7 @@
 		var vals = {};
 		jQuery(field_names).each(function(i, field_name) { 					// process all fields in form
 			var field_name_with_no_period = field_name.replace('.', '_');	// we need a bundle name without periods for compatibility
-			vals[field_name] = jQuery('#' + form_id + ' [id=' + field_name_with_no_period + ']').val();
+			vals[field_name] = jQuery('#' + form_id + ' [id="' + field_name_with_no_period + '"]').val();
 		});
 		vals['_label'] = label;											// special "display" title, used if all else fails
 		vals['_field_list'] = field_names;								// an array for form fields to expect

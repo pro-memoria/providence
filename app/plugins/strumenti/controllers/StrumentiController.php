@@ -42,7 +42,7 @@ class StrumentiController extends ActionController {
         $this->o_db = new Db("", NULL, false);
 
         // Generazione della transizione per tutta la durata dell'utilizzo del plugin
-        $this->transaction_file = $this->plugin_path . '/conf/transaction.json';
+        $this->transaction_file = __CA_CACHE_FILEPATH__ . '/transaction.json';
         $this->transiction = null;
         if (file_exists($this->transaction_file)) {
             $this->transiction = json_decode(file_get_contents($this->transaction_file), true);
@@ -54,10 +54,10 @@ class StrumentiController extends ActionController {
         }
 
         // Gestione del template per l'ordinatore
-        $this->template = json_decode(file_get_contents($this->plugin_path . "/conf/template.json"), true);
+        $this->template = json_decode(file_get_contents(__CA_CACHE_FILEPATH__ . "/template.json"), true);
         if ($this->template == null || empty($this->template)) {
             $this->template = $this->opo_config->get('menu');
-            file_put_contents($this->plugin_path . "/conf/template.json", json_encode($this->template));
+            file_put_contents(__CA_CACHE_FILEPATH__ . "/template.json", json_encode($this->template));
         }
     }
 
@@ -313,10 +313,10 @@ class StrumentiController extends ActionController {
                 }
 
                 $this->template = $menu;
-                file_put_contents($this->plugin_path . "/conf/template.json", json_encode($this->template));
+                file_put_contents(__CA_CACHE_FILEPATH__ . "/template.json", json_encode($this->template));
             } else if ($options['function'] == 'caRipristina') {
                 $this->template = $this->opo_config->get('menu');
-                file_put_contents($this->plugin_path . "/conf/template.json", json_encode($this->template));
+                file_put_contents(__CA_CACHE_FILEPATH__ . "/template.json", json_encode($this->template));
             } else {
 
 

@@ -1,188 +1,225 @@
 <?php
-$user          = $this->getVar( 'user' );
+/**
+ * Created by PhpStorm.
+ * User: lucamontanera
+ * Date: 20/05/16
+ * Time: 11:29
+ */
+$user = $this->getVar('user');
+$current_id = $this->getVar('current_id');
 $user_id = $user->getUserID();
 $user_groups_id = array_keys($user->getUserGroups());
-$administrator = $user->canDoAction( "is_administrator" );
 
 ?>
-<link type = "text/css" rel = "stylesheet"
-      href = "<?php print __CA_URL_ROOT__; ?>/app/widgets/promemoriaTreeObject/resources/jquery.contextMenu.css" >
-<link rel="stylesheet" href="<?php print __CA_URL_ROOT__; ?>/app/widgets/promemoriaTreeObject/resources/themes/proton/style.min.css" />
-
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-<style type = "text/css" >
-    .jstree-node li a {white-space: normal; height: auto; vertical-align: middle; width: 95%;}
-    .option {float: right;color: rgba(130, 130, 130, 1);cursor: pointer;}
-    .option span    {margin: -10px;margin-right: 5px;}
-    .remove {color: #ff0000 ;cursor: pointer;margin-right: 5%;}
-    .dialog {font-size: 14px;text-align: center;}
-    .list   {list-style: none;text-align: start;}
-    .list li {padding: 2%;border-bottom: 1px grey solid;display: flex;}
-    #ObjectWidget   {min-height: 740px;}
-    .search {text-align: center;margin: 2%;font-size: smaller;}
-    .jstree-node .jstree-anchor {line-height: 24px!important;white-space: normal!important;height: auto!important;display: initial;}
-    .jstree-anchor span {
-        display: inline-block;
-        width: 80%;
-    }
-    .jstree-proton .jstree-search {
-        font-style: initial;
-        background-color: rgb(255, 255, 119);
-        font-weight: bold;
-        color: darkblue;
-        display: inline-block;
-        text-transform: uppercase;
-    }
-    .ui-dialog{z-index: 101;}
-    .icon-color {color: #006E2B!important;}
-    .jstree-icon.fa {color: #2D9F27;}
-    .result h4  {
-        text-align: center;
-    }
-
-    .jstree-proton .jstree-hovered {
-        background: rgba(108, 222, 152, 0.4);
-        color: #000;
-        border-radius: 3px;
-        box-shadow: inset 0 0 1px rgba(108, 222, 152, 0.4);
-        padding: 0.7%;
-    }
-
-    .jstree-proton .jstree-clicked {
-        background: rgba(108, 222, 152, 0.8);
-        color: #000;
-        border-radius: 3px;
-        box-shadow: inset 0 0 1px rgba(108, 222, 152, 0.8);
-        padding: 0.8%;
-    }
-    #navigation-drawer{
-        border:2px solid #DDDDDD;
-        padding:1em;
-        position:fixed;
-        top:0;
-        left:0;
-        background-color: white;
-        height:99vh;
-		width: 29%;
-        display:none;
-        z-index:999;
-    }
-    #action-bar {
+<style>
+    .contestual-tree {
         position: fixed;
-        top: 25%;
-        left: 0;
-        background-color: #DDDDDD;
-        padding: 15px;
-        border-radius: 0px 10px 10px 0px;
+        top: 0;
+        left: -200%;
+        display: block;
+        height: 100vh;
+        min-width: 447px;
+        background-color: white;
+        border-right: 1.5px solid #EDEDED;
+        padding: 1% 3% 0 1%;
+        transition: left 1s;
+        z-index: 1;
+
+        will-change: left;
+        transition: left .25s ease-out;
     }
-    .dashboardwidgetsScrollLarge    {
-        margin: 0 1.5em;
+    .tree-container {
+        margin-top: 75px;
+        height: 100%;
         overflow-y: auto;
-        height: 99vh;
-        max-width: 470px;
-
-    }
-     
-    #show-drawer{
-        cursor:pointer;
+        display: none;
     }
 
-    .command-drawer {
+    #archiuitree {
+        height: 85%;
+        overflow-y: auto;
+        margin-bottom: 110px;
+    }
+
+    .tree-icons {
+        position: fixed;
+        background-color: white;
+        width: 35px;
+        height: 35px;
+        border: 1.5px solid #EDEDED;
+        border-radius: 50%;
+        top: 50%;
+        left: 15px;
+        cursor: pointer;
+    }
+
+    .tree-icons .fa {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.5em;
+        color: #06B86F;
+    }
+
+    .contestual-tree.open {
+        left: 0!important;
+        display: block;
+    }
+
+    .contestual-tree.open .tree-icons {
+        position: absolute;
+        left: 96%;
+    }
+
+    .contestual-tree.open .tree-container {
+        display: block;
+    }
+
+    .jstree-proton .treenode-cont.jstree-clicked {
+        background: #1EB771;
+        color: #FFF;
+    }
+
+    .treenode-cont:hover .controls, .jstree-clicked .controls {
+        display: none!important;
+    }
+
+    .treenode-cont .dnd, .jstree-clicked .dnd {
+        display: none!important;
+    }
+
+    .col-md-9 {
+        width: 83.33333333%;
+        float: left;
+        position: relative;
+        min-height: 1px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .tree-container span.label {
         display: inline-block;
-        margin: 50px 0 0 0;
         width: 95%;
     }
-    #hide-drawer    {
-        cursor: pointer;
-        float: right;
+
+    .active .tree-icons {
+        background: rgba(255, 255, 255, .75);
     }
+
+    .contestual-tree.open-lg {
+        left: 0!important;
+        width: 93%;
+    }
+
+    .contestual-tree.open-lg .tree-icons {
+        left: 98.5%!important;
+    }
+
+    .spinner.active {
+        display: block;
+        height: 35px;
+        width: 35px;
+        position: absolute;
+        animation: rotate .5s infinite linear;
+        border: 1px solid #06B86F;
+        border-right-color: transparent;
+        border-left-color: transparent;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        top: auto;
+    }
+
+    @keyframes rotate {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
 </style>
-<script src = "<?php print __CA_URL_ROOT__; ?>/app/widgets/promemoriaTreeObject/resources/jstree.min.js" type = "text/javascript" ></script >
-
-<div id='wpca_hierarchy_container'>
-
-<div id='action-bar'>
-    <div id='show-drawer'><i class="fa fa-pagelines fa-2x"></i></div>
-</div>
-
-<div id='navigation-drawer'>
-    <div class="command-drawer">
-        <i id='hide-drawer' class="fa fa-arrow-circle-o-left fa-3x"></i>
+<div class="contestual-tree">
+    <div class="tree-container">
+        <div id="archiuitree"></div>
     </div>
-	<div class = "dashboardwidgetsContentContainer" >
-	    <div class = "dashboardwidgetsScrollLarge" >
-	        <div class="search"><span class="fa fa-search"> </span> <input type="text" id="plugins4_q" placeholder="Cerca" /></div>
-	        <div id = "promemoria" style = "clear:both;height:85%;overflow-y:auto;overflow-x:hidden" >
-	        </div >
-	    </div >
-	</div>
-<script >
-    jQuery(function ($) {
+    <div class="tree-icons">
+        <i class="fa fa-2x fa-pagelines"></i>
+        <!--<div class="spinner"></div>-->
+    </div>
+</div>
+<script>
+    jQuery(document).ready(function () {
+        var timeoutId = 0;
 
+        // jQuery('.contestual-tree').css('left', '-' + (jQuery('.contestual-tree').outerWidth() - (jQuery('.contestual-tree').outerWidth() * 3 /100) - 10) + 'px');
 
-    	// show the navigation drawer
-    	jQuery('#show-drawer').click(function(){
-    	
-    	    jQuery('#navigation-drawer').show('slide', { direction: 'left' }, 300);
-    	     
-    	    jQuery(this).hide();
-    	    jQuery('#hide-drawer').show();
-
-    	    // setTimeout(function() {
-    	    //     jQuery('.dashboardwidgetsScrollLarge').scrollTop(jQuery('.jstree-clicked').position().top -10);
-    	    // }, 500);
-    	         
-    	});
-    	 
-    	// hide the navigation drawer
-    	jQuery('#hide-drawer').click(function(){
-    	
-    	    jQuery('#navigation-drawer').hide('slide', { direction: 'left' }, 300);
-    	     
-    	    jQuery(this).hide();
-    	    jQuery('#show-drawer').show();
-    	         
-    	});
-
-    	var current_id = window.location.pathname.split('/').pop().toString();
-
-
-        var promemoria = $("#promemoria");
-        promemoria.jstree({
-            "plugins": ["search", "state", "types"],
-            "core" : {
-                "animation" : 0,
-                "check_callback" : true,
-                "themes" : { 'name': 'proton', "stripes" : false, "responsive": true },
-                "data": {
-                    "url": "<?php print __CA_URL_ROOT__; ?>/app/widgets/promemoriaTreeObject/ajax/ajax.php",
-                    "dataType" : "json",
-                    "data": function (n) {
-                        return {
-                            "operation": "get_children_contestuale",
-                            "id": n.id != '#' ? n.id : 0,
-                            "order" : (n.attr && n.attr("order")) ? n.attr("order") : '',
-                            "verso": (n.attr && n.attr("verso")) ? n.attr("verso") : '',
-                            "user_id": <?php print $user_id; ?>,
-                            "user_groups": "<?php print implode(",", $user_groups_id) ?>"
-                        };
-                    }
-                }
-            }
-        })
-        
-        $("#promemoria").on("click", "a", function () {
-            location.href = "<?php print __CA_URL_ROOT__; ?>/index.php/editor/objects/ObjectEditor/Edit/object_id/" + $(this).parent().attr("id");
+        jQuery('.contestual-tree .tree-icons').mousedown(function() {
+            jQuery( '.spinner' ).addClass('active');
+            timeoutId = setTimeout(function () {
+                jQuery( '.contestual-tree' ).toggleClass( "open open-lg" );
+            }, 500);
+        }).bind('mouseup mouseleave', function() {
+            clearTimeout(timeoutId);
+            jQuery( '.spinner' ).removeClass('active');
         });
 
-        var to = false;
-        $('#plugins4_q').keyup(function () {
-            if(to) { clearTimeout(to); }
-                to = setTimeout(function () {
-                var v = $('#plugins4_q').val();
-                promemoria.jstree(true).search(v);
-            }, 250);
-      });
+        jQuery('.contestual-tree').on('click', '.tree-icons', function (e)   {
+            jQuery( '.contestual-tree' ).toggleClass( "open" );
+            if (jQuery( '.contestual-tree' ).hasClass('open-lg'))  {
+                jQuery( '.contestual-tree' ).removeClass('open-lg');
+            }
+        });
+
+        var archiuitree = jQuery('#archiuitree').jstree({
+            "plugins" : [ "types", "dnd", "state" ],
+            'core': {
+                "check_callback" : true,
+                "multiple": false,
+                'themes': {
+                    'name': 'proton',
+                    'responsive': true
+                },
+                'data': {
+                    "url": "<?php echo __CA_URL_ROOT__; ?>/app/widgets/promemoriaTreeObject/ajax/ajax.php?operation=get_children_contestuale",
+                    "dataType": "json",
+                    "method": "POST",
+                    "data": function (n) {
+                        return {
+                            "id": n.id !== '#' ? n.id : 0,
+                            "user_id": <?php print $user_id; ?>,
+                            "user_groups": "<?php print implode(',', $user_groups_id); ?>",
+                            "current_id": <?php print $current_id; ?>
+                        }
+                    }
+                },
+                "types" : {
+                    "default" : {
+                        "icon" : "fa fa-archive"
+                    }
+                },
+            }
+        });
+
+        // var lastHeight = jQuery('.contestual-tree').outerWidth();
+        // function checkForChanges() {
+        //     if (jQuery('.contestual-tree').outerWidth() != lastHeight) {
+        //         jQuery('.contestual-tree').css('left', '-' + (jQuery('.contestual-tree').outerWidth() - (jQuery('.contestual-tree').outerWidth() * 3 /100) - 10) + 'px');
+        //         lastHeight = jQuery('.contestual-tree').outerWidth();
+        //     }
+
+        //     setTimeout(checkForChanges, 500);
+        // }
+        // checkForChanges();
+
+
+        var draggerWidth = 10, // width of your dragger
+            down = false,
+            rangeWidth, rangeLeft;
+
+        jQuery('#archiuitree').on('click', '.jstree-anchor', function ()    {
+            location.href = "<?php echo __CA_URL_ROOT__; ?>/index.php/editor/objects/ObjectEditor/Edit/object_id/" + jQuery(this).parents('.jstree-node').attr('id');
+        });
     });
-</script >
-</div>
+</script>

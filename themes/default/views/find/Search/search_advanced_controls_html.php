@@ -88,7 +88,7 @@
 	function caSaveSearch(form_id, label, field_names) {
 		var vals = {};
 		jQuery(field_names).each(function(i, field_name) { 	// process all fields in form
-			vals[field_name] = jQuery('#' + form_id + ' [name=' + field_name + ']').val();	
+			vals[field_name] = jQuery('#' + form_id + ' [name="' + field_name + '"]').val();	
 		});
 		vals['_label'] = label;								// special "display" title, used if all else fails
 		vals['_field_list'] = field_names					// an array for form fields to expect

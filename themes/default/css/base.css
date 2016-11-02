@@ -733,6 +733,7 @@ ul.sf-menu li li li.sfHover ul {
 .sf-menu li li a, .sf-menu  li li a:visited, .sf-menu li li li a, .sf-menu  li li li a:visited  { /* visited pseudo selector so IE6 applies text colour*/
     color:			#4b4a4a;
     font-weight:normal;
+    line-height: 1.2em;
 }
 .sf-menu li:hover, .sf-menu li.sfHover,
 .sf-menu a:focus, .sf-menu a:hover, .sf-menu a:active,
@@ -758,8 +759,7 @@ li.sfHover > a:link, li.sfHover > a:visited {
 }
 
 .sf-menu-selected,  .sf-menu li li a.sf-menu-selected, .sf-menu li li li a.sf-menu-selected{
-    color:#FFFFFF;
-    background-color: #4b4a4a;
+    color:#333;
 }
 .sf-menu.sf-menu-search img {
     height:14px;
@@ -768,13 +768,11 @@ li.sfHover > a:link, li.sfHover > a:visited {
     margin: 5px 12px 0px 0px;
 }
 a.sf-menu-selected {
-    color:#FFFFFF;
-    background-color: #4b4a4a;
+    color:#333;
 }
 
 a.sf-menu-selected:hover {
     color:#444444;
-    background-color: #4b4a4a;
 }
 
 #leftNav h2 a.sf-menu-selected {
@@ -782,18 +780,16 @@ a.sf-menu-selected:hover {
     background-color: #ddd;
     background-repeat:no-repeat;
     background-position: top right;
-    height:13px;
 }
 
 a.sf-menu-disabled-selected, #leftNav h2 a.sf-menu-disabled-selected {
     opacity: 0.6;
-    color:#FFFFFF;
-    background-color: #4b4a4a;
+    color:#333;
 }
 
 a.sf-menu-disabled {
     opacity: 0.5;
-    color:#FFFFFF;
+    color:#333;
 }
 
 .sf-spacer {
@@ -6862,7 +6858,7 @@ div.authorityReferenceListContainer {
 
 /*Promemoria*/
 .recordTitle {
-    font-size: 24px;
+    font-size: 14px;
     color: #53C5D5;
 }
 
