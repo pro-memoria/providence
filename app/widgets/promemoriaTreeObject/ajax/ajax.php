@@ -14,13 +14,7 @@ $_SERVER['SCRIPT_FILENAME'] = implode( "/", array_slice( $array, 0, count( $arra
 require($base_path.'/setup.php');
 
 $o_db          = new Db( NULL, NULL, false );
-if (!file_exists(__CA_CACHE_FILEPATH__.'/promemoriaTreeObjectAttr.json'))    {
-    file_put_contents(__CA_CACHE_FILEPATH__.'/promemoriaTreeObjectAttr.json', json_encode(array(
-        'users' => array('metadata' => array(), 'summary' => 0),
-        'groups' => array('metadata' => array(), 'summary' => 0),
-        'default' => array('metadata' => array('preferred_label'), 'summary' => 0))));
-}
-$opo_config = json_decode(file_get_contents(__CA_CACHE_FILEPATH__.'/promemoriaTreeObjectAttr.json'));
+$opo_config = json_decode(file_get_contents(__CA_APP_DIR__.'/widgets/promemoriaTreeObject/conf/promemoriaTreeObjectAttr.json'));
 
 function saveChildren( $children, $parent_id = "null" ) {
     global $o_db;
@@ -226,7 +220,7 @@ switch ( $operation ) {
                     }
                 }
             }
-
+            $flag = true;
             foreach ((($metadataAttr == null ) ? $opo_config->default : $metadataAttr) as $metadato) {
 
                 switch ($metadato) {
@@ -290,6 +284,7 @@ switch ( $operation ) {
                                 $text2 = "(" . $text2 . ")";
                             }
                         } else {
+                            $flag = false;
                             $text2 = $nome;
                         }
                         if ($text2 == "")   $sep = "";
@@ -298,6 +293,11 @@ switch ( $operation ) {
                 }
 
             }
+
+            if (!$flag) {
+                $text .= $name;
+            }
+
             if ($tipologia != '') $text = $tipologia . $text;
             $nodo->text = "<span>".( rtrim(trim($text), '|') )."</span>";
 
@@ -575,7 +575,7 @@ QUERY;
         }
 
         //Modifico il file di configurazione in modo che al caricamento ricarichi le informazioni
-        file_put_contents( __CA_CACHE_FILEPATH__.'/promemoriaTreeObjectAttr.json', json_encode($opo_config));
+        file_put_contents( __CA_APP_DIR__.'/widgets/promemoriaTreeObject/conf/promemoriaTreeObjectAttr.json', json_encode($opo_config));
         break;
     default:
         break;

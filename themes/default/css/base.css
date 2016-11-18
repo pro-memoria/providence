@@ -5760,6 +5760,8 @@ div.searchlight-results div.searchlight-selected {
 
 .olMapSearchBoxIcon {
     margin: 12px 8px 0 0;
+    position: absolute;
+    top: 9px;
 }
 
 .olMapSearchBox input {
@@ -6864,4 +6866,8 @@ div.authorityReferenceListContainer {
 
 .bundleLabel a img {
     margin-top: 3px;
+}
+
+.quickAddControls > a img.form-button-left {
+	margin: -6px;
 }

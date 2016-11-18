@@ -90,5 +90,27 @@
 
 <!-- Archiui -->
 <?php
-
+	$container = array();
+	$type_id = $t_object->get('type_id');
+	$tsk = array(290 => 1752, 289 => 1753, 288 => 1754, 286 => 1755, 2565 => 2570, 287 => 1756 );
+	foreach ($va_bundle_list as $screen) {
+		if ($screen['bundle'] == 'ca_attribute_tsk') {
+			$container = $screen;
+			break;
+		}
+	}
 ?>
+<!--<script type="text/javascript">
+	jQuery(document).ready(function($) {
+		var container = <?php echo json_encode($container) ?>;
+		jQuery('.bundleLabel div#' + container['id'] + '_attribute_195').ready(function (e) {
+			var options = jQuery('.bundleLabel div#' + container['id'] + '_attribute_195').find('.attributeListItem .formLabel select option');
+			options.each(function(index, option) {
+				if (option.value == '<?php echo $tsk[$type_id]; ?>') {
+					jQuery(option).prop('selected', 'selected');
+				}
+			});
+
+		});
+	});
+</script>-->

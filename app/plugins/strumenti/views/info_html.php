@@ -16,9 +16,9 @@ $ajax_path = $this->getVar( 'root' ) . 'strumenti/Strumenti';
             return 'You sure you want to leave?';
         }
     };
-    window.onunload = function() {
-        jQuery.get("<?php echo $ajax_path ?>/Leave");
-    }
+    // window.onunload = function() {
+    //     jQuery.get("<?php echo $ajax_path ?>/Leave");
+    // }
 
     $('#leftNavSidebar').html(`
         <div id="infoSelezionati">
