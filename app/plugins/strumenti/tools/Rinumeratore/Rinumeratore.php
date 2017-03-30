@@ -14,13 +14,15 @@ class Rinumeratore  {
     protected $config;
     protected $category;
     protected $updateItem;
+    protected $user;
 
-    public function __construct($params)   {
+    public function __construct($params, $user)   {
         $this->options = $params;
         $this->config = Configuration::load(__CA_APP_DIR__ . "/plugins/strumenti/tools/Rinumeratore/rinumeratore_opt.conf");
         $this->category = $this->config->get('categorie');
         $this->storico = array();
         $this->updateItem = array();
+        $this->user = $user;
     }
 
     public function run($idPartenza, $numeroPartenza = 1, $tipo_prefisso = 'nessuno', $type) {
@@ -83,8 +85,10 @@ class Rinumeratore  {
 
         foreach ($children as $child)   {
             $bimbo = new ca_objects($child);
-            $listp = $bimbo->getTypeInstance()->getHierarchyAncestors(null, array('idsOnly' => true));
-            $bimbo_type = $bimbo->getTypeCode($listp[count($listp) -2]);
+	        if ($bimbo->checkACLAccessForUser($this->user) < __CA_ACL_EDIT_DELETE_ACCESS__) {
+	        	continue;
+	        }
+            $bimbo_type = $bimbo->getTypeCode(reset($bimbo->getTypeInstance()->getHierarchyAncestors(null, array('idsOnly' => true))));
             if ($bimbo_type == 'Root node for object_types')  {
                 $bimbo_type = $bimbo->getTypeCode();
             }
@@ -141,11 +145,14 @@ class Rinumeratore  {
 
         foreach ($children as $child) {
             $bimbo = new ca_objects($child);
-            $listp = $bimbo->getTypeInstance()->getHierarchyAncestors(null, array('idsOnly' => true));
-            $bimbo_type = $bimbo->getTypeCode($listp[count($listp) -2]);
+	        if ($bimbo->checkACLAccessForUser($this->user) < __CA_ACL_EDIT_DELETE_ACCESS__) {
+		        continue;
+	        }
+            $bimbo_type = $bimbo->getTypeCode(reset($bimbo->getTypeInstance()->getHierarchyAncestors(null, array('idsOnly' => true))));
             if ($bimbo_type == 'Root node for object_types')  {
                 $bimbo_type = $bimbo->getTypeCode();
             }
+
             if ($bimbo_type == $type) {
                 switch ($tipo_prefisso) {
                     case 'gerarchico':

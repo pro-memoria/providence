@@ -6,19 +6,20 @@
  * Time: 10:00
  */
 
-function ord_string($a, $b) {
-    return strcmp($a, $b);
+function ord_string($a, $b, $desc = false) {
+    return ($desc) ? strcmp($a, $b)* -1 : strcmp($a, $b);
 }
 
-function ord_number($a, $b) {
+function ord_number($a, $b, $desc = false) {
     $inta = floatval($a);
     $intb = floatval($b);
-    if ($inta > $intb)  return 1;
-    if ($inta < $intb) return -1;
+
+    if ($inta > $intb)  return ($desc) ? -1 : 1;
+    if ($inta < $intb) return ($desc) ? 1 : -1;
     return 0;
 }
 
-function ord_romano($a, $b) {
+function ord_romano($a, $b, $desc = false) {
 
     $romans = array(
         'M' => 1000,
@@ -56,19 +57,19 @@ function ord_romano($a, $b) {
     else if ($rA == 0) return -1;
     else if ($rB == 0) return 1;
 
-    return ord_number($rA, $rB);
+    return ord_number($rA, $rB, $desc);
 }
 
-function ord_list($a, $b) {
+function ord_list($a, $b, $desc = false) {
     require_once(__CA_MODELS_DIR__."/ca_list_items.php");
 
     $itemA = new ca_list_items($a);
     $itemB = new ca_list_items($b);
 
-    return ord_number($itemA->get('rank'), $itemB->get('rank'));
+    return ord_number($itemA->get('rank'), $itemB->get('rank'), $desc);
 }
 
-function ord_data($a, $b) {
+function ord_data($a, $b, $desc = false) {
     require_once(__CA_LIB_DIR__."/core/Parsers/TimeExpressionParser.php");
 
     if ($a == null && $b == null) {
@@ -88,5 +89,5 @@ function ord_data($a, $b) {
     $dateA = $dateA['start'];
     $dateB = $dateB['start'];
 
-    return ord_number($dateA, $dateB);
+    return ord_number($dateA, $dateB, $desc);
 }

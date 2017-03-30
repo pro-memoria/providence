@@ -330,6 +330,8 @@ $administrator = $po_request->user->canDoAction( "is_administrator" );
                 },
                 dataType: "json"
             });
+        }).bind("load_node.jstree", function (e, node) {
+			$(e.target).find('.jstree-anchor').attr('href', "<?php print __CA_URL_ROOT__; ?>/index.php/editor/objects/ObjectEditor/Edit/object_id/" + node['node']['children_d'][0]);
         });
         	/*$('.showsummary').unbind().click(function (event)  {
                 var id = $(this).parent().parent().attr('id');

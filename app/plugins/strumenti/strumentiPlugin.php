@@ -19,7 +19,12 @@ class strumentiPlugin extends BaseApplicationPlugin {
     }
     
     static public function getRoleActionList() {
-        return array();
+	    return array(
+		    'can_use_strumenti' => array(
+			    'label' => _t('Can use il plugin strumenti'),
+			    'description' => _t('User can use il plugin strumenti')
+		    )
+	    );
     }
 
     public function checkStatus() {
@@ -35,52 +40,49 @@ class strumentiPlugin extends BaseApplicationPlugin {
      * Il metodo va a creare una voce in un menu al quale associa un'azione del controller del plugin
      */
     public function hookRenderMenuBar( $pa_menu_bar ) {
-        if ( $o_req = $this->getRequest() ) {
 
-            //Controllo se è presente la voce principale al quale aggiungere la mia
-            if ( isset( $pa_menu_bar['archiui'] ) ) {
-                /*
-                 * Se esiste ci vado ad aggiungere la mia voce.
-                 * va aggiunta alla voce navigation del menu principale al quale lo si vuole inserire.
-                 * il default è composto dai campi:
-                 *      module: nome della cartella del plugin,
-                 *      controller: il nome del controller (senza il suffisso 'Controller')
-                 *      action: il metodo del controller da eseguire
-                */
-                $pa_menu_bar['archiui']['navigation']['strumenti'] = array(
-                    'displayName'     => _t( 'Gestione archivio' ),
-                    "default"         => array(
-                        'module'     => 'strumenti',
-                        'controller' => 'Strumenti',
-                        'action'     => 'Index'
-                    ),
-                    "useActionInPath" => 1,
-                    'require'         => array()
-                );
-            } else {
-                //Se non esiste lo creo
-                $pa_menu_bar['archiui'] = array(
-                    'displayName' => _t( 'Strumenti' ),
-                    "default"     => array(
-                        'module'     => 'strumenti',
-                        'controller' => 'Strumenti',
-                        'action'     => 'Index'
-                    ),
-                    'require'     => array(),
-                    'navigation'  => array(
-                        'ordinatore_ordinatore' => array(
-                            'displayName' => _t( 'Gestione archivio' ),
-                            "default"     => array(
-                                'module'     => 'strumenti',
-                                'controller' => 'Strumenti',
-                                'action'     => 'Index'
-                            ),
-                            'require'     => array()
-                        )
-                    )
-                );
-            }
-        }
+        //Controllo se è presente la voce principale al quale aggiungere la mia
+       if ( isset( $pa_menu_bar['archiui'] ) ) {
+           /*
+            * Se esiste ci vado ad aggiungere la mia voce.
+            * va aggiunta alla voce navigation del menu principale al quale lo si vuole inserire.
+            * il default è composto dai campi:
+            *      module: nome della cartella del plugin,
+            *      controller: il nome del controller (senza il suffisso 'Controller')
+            *      action: il metodo del controller da eseguire
+           */
+           $pa_menu_bar['archiui']['navigation']['strumenti'] = array(
+               'displayName'     => _t( 'Gestione archivio' ),
+               "default"         => array(
+                   'module'     => 'strumenti',
+                   'controller' => 'Strumenti',
+                   'action'     => 'Index'
+               ),
+               'require'         => array()
+           );
+       } else {
+           //Se non esiste lo creo
+           $pa_menu_bar['archiui'] = array(
+               'displayName' => _t( 'Strumenti' ),
+               "default"     => array(
+                   'module'     => 'strumenti',
+                   'controller' => 'Strumenti',
+                   'action'     => 'Index'
+               ),
+               'require'     => array(),
+               'navigation'  => array(
+                   'ordinatore_ordinatore' => array(
+                       'displayName' => _t( 'Gestione archivio' ),
+                       "default"     => array(
+                           'module'     => 'strumenti',
+                           'controller' => 'Strumenti',
+                           'action'     => 'Index'
+                       ),
+                       'require'     => array()
+                   )
+               )
+           );
+       }
 
         return $pa_menu_bar;
     }

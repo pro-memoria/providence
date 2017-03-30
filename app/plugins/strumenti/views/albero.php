@@ -30,7 +30,7 @@ $refinisci_restriction = $this->getVar( 'refinisci_restriction' );
 <script>
     var archiuitree = null;
     var disableExitControl = false;
-
+    var iscut = 0;
 
     jQuery(function() {
         archiuitree = jQuery('#archiuitree').jstree({
@@ -81,9 +81,11 @@ $refinisci_restriction = $this->getVar( 'refinisci_restriction' );
                 jQuery('#btnDeselezione').addClass('disable');
             }
             manageAction(selected);
+        }).on('cut.jstree', function (e, data)    {
+            iscut = data.node.length;
         }).on('paste.jstree', function (e, data)    {
             var node = [];
-            jQuery.each(data.node, function(i, item)   {
+            jQuery.each(data.node.reverse(), function(i, item)   {
                 node.push(item.id);
             });
             jQuery.ajax({
@@ -93,13 +95,28 @@ $refinisci_restriction = $this->getVar( 'refinisci_restriction' );
                 dataType: "json"
             });
         }).on('move_node.jstree', function (e, data)    {
-            var post = archiuitree.jstree().get_json();
-            jQuery.ajax({
-                type: 'POST',
-                url: "<?php echo $ajax_path; ?>/Move",
-                data: {"data": JSON.stringify(post)},
-                dataType: "json"
-            });
+            if (iscut > 0) { iscut--; return; }
+            // if (selectNodeCount === 1 ) {
+                // var post = archiuitree.jstree().get_json();
+                var tmp = {
+                    id: data.node.id,
+                    old_parent: data.old_parent,
+                    parent: data.parent,
+                    old_position: data.old_position,
+                    position: data.position
+                };
+                jQuery.ajax({
+                    type: 'POST',
+                    url: "<?php echo $ajax_path; ?>/Move",
+                    data: {"data": tmp},
+                    dataType: "json"
+                });
+            /*} else {
+                selectNodeCount--;
+            }*/
+        }).on('after_open.jstree', function (e, node) {
+            var node = jQuery(this).parents('.jstree-node');
+            node.find('.dnd i').removeClass('fa-spinner fa-pulse').addClass('fa-bars');
         });
 
         function openNode(e) {
@@ -108,6 +125,7 @@ $refinisci_restriction = $this->getVar( 'refinisci_restriction' );
                 archiuitree.jstree().close_node(node);
             } else {
                 archiuitree.jstree().open_node(node);
+                node.find('.dnd i').removeClass('fa-bars').addClass('fa-spinner fa-pulse');
             }
         }
 

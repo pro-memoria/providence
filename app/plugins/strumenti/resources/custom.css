@@ -241,10 +241,10 @@
     margin: 0;
     padding: 8px 20px 0 10px;
 
-    color: #FFF;
+    color: #000;
     -moz-border-radius: 0;
     border-radius: 0;
-    background-color: #06B86F;
+    border: 1px solid #06B86F;
 }
 .modal footer span.form-button img {
     width: 25px;
@@ -510,4 +510,8 @@ option[default] {
 
 #modal-ordinatore .twotype input[name='TwoType']:after {
     top: -8px;
+}
+
+#modal-ordinatore footer input[name='decrescente'] {
+    margin: 3% 15px;
 }

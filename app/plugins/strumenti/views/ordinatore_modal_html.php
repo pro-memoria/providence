@@ -6,8 +6,8 @@
  * Time: 08:37
  */
 
-$menu = $this->getVar('template_ordinatore');
-// $complete = $this->getVar('menu_ordinatore');
+// $menu = $this->getVar('template_ordinatore');
+$menu = $this->getVar('menu_ordinatore');
 ?>
 <div id="modal-ordinatore" class="modal">
     <?php
@@ -138,9 +138,10 @@ $menu = $this->getVar('template_ordinatore');
 
     </article>
     <footer>
+        <input type="checkbox" name="decrescente" value="desc"> Decrescente
         <?php
-        print caJSButton($this->request, __CA_NAV_BUTTON_UPDATE__, _t('RIPRISTINA TEMPLATE'), 'caRipristina');
-        print caJSButton($this->request, __CA_NAV_BUTTON_SAVE__, _t('SALVA CONFIGURAZIONE'), 'caSave');
+        // print caJSButton($this->request, __CA_NAV_BUTTON_UPDATE__, _t('RIPRISTINA TEMPLATE'), 'caRipristina');
+        // print caJSButton($this->request, __CA_NAV_BUTTON_SAVE__, _t('SALVA CONFIGURAZIONE'), 'caSave');
         print caJSButton($this->request, __CA_NAV_BUTTON_GO__, _t('ORDINA'), 'caOrd');
         ?>
         <input type="hidden" name="function" value="">

@@ -13,8 +13,9 @@ class Ordinatore {
     protected $toChange;
     protected $options;
     protected $criteri;
+    protected $sort;
 
-    public function __construct($toSort, $connection = null) {
+    public function __construct($toSort, $desc = false, $connection = null) {
         global $db;
 
         $this->toSort = $toSort;
@@ -25,6 +26,8 @@ class Ordinatore {
         } else {
             $db = $connection;
         }
+
+        $this->sort = $desc;
     }
 
     public function run($parent_id, $toSort)   {
@@ -33,10 +36,11 @@ class Ordinatore {
         $items = array();
         foreach ($children as $child)   {
             $item = $this->generaItem($child, $toSort);
-            if ($item != null)  {
+            if ($item != null) {
                 $items[$child] = $item[$child];
             }
         }
+
         $item_sort = $this->sortItems($items, $toSort);
         $this->setChange($item_sort);
 
@@ -50,7 +54,10 @@ class Ordinatore {
 
     private function generaItem($obj_id, $toSort) {
         $object = new ca_objects($obj_id);
+        //if (!$object->errors()) { return array(); }
         $object_type = $this->typeInfo($object);
+        if ($object_type == null ) { return null; }
+
         $items = array();
         if (isset($toSort['all'])) {
             $items[$obj_id] = array('type' => 'all');
@@ -73,7 +80,7 @@ class Ordinatore {
             } else if (isset($toSort[$object_type['parent']])) {
                 $items[$obj_id] = array('type' => $object_type);
                 $metadata = $this->options->get($toSort[$object_type['parent']]);
-                foreach ($metadata as $code) {
+                foreach ($metadata as $code ) {
                     $items[$obj_id][$code] = $object->get($code);
                 }
                 $items[$obj_id]['type3'] = true;
@@ -85,7 +92,11 @@ class Ordinatore {
 
     private function typeInfo($obj = NULL)  {
         $plural = $this->options->get('plural');
-        $istance = $obj->getTypeName(reset($obj->getTypeInstance()->getHierarchyAncestors(null, array('idsOnly' => true))));
+        $typeInstace = $obj->getTypeInstance();
+        if (!method_exists($typeInstace, 'getHierarchyAncestors')) {
+            return null;
+        }
+        $istance = $plural[$obj->getTypeName(reset($typeInstace->getHierarchyAncestors(null, array('idsOnly' => true))))];
         return array(
             'id' => $obj->getTypeID(),
             'code' => $obj->getTypeCode(),
@@ -121,6 +132,7 @@ class Ordinatore {
                 $this->mysort($group, array_values($this->options->get($toSort[$type])));
             }
         }
+
         $this->sortByPriority($groups);
         $newItems = array();
         foreach ($groups as $group) {
@@ -160,7 +172,7 @@ class Ordinatore {
                 }
             }
         }
-	   return $items;
+        return $items;
     }
 
     private function mergesort(&$items, $key, $range)    {
@@ -180,7 +192,7 @@ class Ordinatore {
 
         $i = $fst; $j = $mid +1; $k = $fst;
         while ($i <= $mid && $j <= $lst)    {
-            $aux[$k++] = (call_user_func($this->criteri[$key], $a[$i][$key], $a[$j][$key]) <= 0) ? $a[$i++] : $a[$j++];
+            $aux[$k++] = (call_user_func($this->criteri[$key], $a[$i][$key], $a[$j][$key], $this->sort) <= 0) ? $a[$i++] : $a[$j++];
         }
 
         $h = $mid; $l = $lst;

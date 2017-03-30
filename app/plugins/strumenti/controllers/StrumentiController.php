@@ -25,6 +25,9 @@ class StrumentiController extends ActionController {
     protected $transaction_file;
     protected $o_db;
 
+    protected $opo_app_plugin_manager;
+    protected $user;
+
     protected $template;
 
     public function __construct(&$po_request, &$po_response, $pa_view_paths = NULL) {
@@ -33,7 +36,11 @@ class StrumentiController extends ActionController {
         $this->plugin_url = __CA_URL_ROOT__;
         $this->ausiliarView = new View($po_request);
 
+        $this->user = $po_request->user;
+
         AssetLoadManager::register('panel');
+
+        $this->opo_app_plugin_manager = new ApplicationPluginManager();
 
         //Recupero il file di configurazione del plugin
         $this->opo_config = Configuration::load($this->plugin_path . '/conf/strumenti.conf');
@@ -119,13 +126,12 @@ class StrumentiController extends ActionController {
 
         $transazione = new Transaction($this->o_db, MYSQLI_TRANS_START_WITH_CONSISTENT_SNAPSHOT);
         $this->runTransaction($transazione, false, true, true);
-
         //query per recuperare gli oggetti
         if ($user->canDoAction('is_administrator')) {
             $query = "
               SELECT t.object_id as id, t.parent_id,t.type_id as type, l.name as text, (SELECT COUNT(*) FROM ca_objects p WHERE t.object_id = p.parent_id) hasChildren
               FROM ca_objects t INNER JOIN ca_object_labels l ON (t.object_id=l.object_id)
-    		  WHERE deleted = 0 AND l.is_preferred = 1 AND ";
+              WHERE deleted = 0 AND l.is_preferred = 1 AND ";
         } else {
             $query = "
               SELECT t.object_id as id, t.parent_id,t.type_id as type, l.name as text, (SELECT COUNT(*) FROM ca_objects p WHERE t.object_id = p.parent_id) hasChildren
@@ -142,6 +148,7 @@ class StrumentiController extends ActionController {
         } else {
             $query .= "t.parent_id = " . $_POST['id'];
         }
+
         $query .= " ORDER BY t.ordine";
         $qr_result = $this->o_db->query($query);
         $i = 0;
@@ -160,26 +167,21 @@ class StrumentiController extends ActionController {
 
             //Recupero tutte le informazioni in più che l'utente vuole inserire
             $tipologia = '';
-            $text = $nome;
+            $text = '';
 
-            $attr_num_def = $this->o_db->query("SELECT v.value_longtext1 as 'value' FROM ca_attribute_values v INNER JOIN ca_attributes a ON (a.attribute_id = v.attribute_id) WHERE v.element_id = 1133 AND a.table_num = 57 AND a.row_id = {$objectId}");
-            if ($attr_num_def->nextRow())  {
-                $num_def = $attr_num_def->get('value');
-            }
-            if ($num_def != "")   {
-                $text = $num_def . " " . $text;
-            }
-            $num_def = '';
+            // Recupero metadati aggiuntivi da visualizzare
+            $object = new ca_objects($objectId);
+            $list_metadati = $this->opo_config->get('metadati');
 
-            $aa = $this->o_db->query( "SELECT v.value_longtext1 as 'value' FROM ca_attribute_values v INNER JOIN ca_attributes a ON (a.attribute_id = v.attribute_id) WHERE (v.element_id = 283 OR v.element_id = 39) AND a.table_num = 57 AND a.row_id = {$objectId}" );
-            if ( $aa->nextRow() ) {
-                $data = $aa->get( "value" );
-                $dataIniziale = ($data == 'undated') ? '' : $data;
+            foreach ($list_metadati as $metadato => $template)   {
+                if ($metadato == "preferred_labels") {
+                    $text .= $nome . " ";
+                } else {
+                    $text .= $object->get($metadato, array("convertCodesToDisplayText" => true, "template" => $template));
+                }
             }
-
-            if ($dataIniziale != '')    {
-                $text = $text . ",<i>" . $dataIniziale . "</i>" . " ";
-            }
+            //
+            // $object->get(, array("convertCodesToDisplayText" => true));
 
             $nodo->text = "<span data-type='{$type}'>" . (rtrim(trim($text), '|')) . "</span>";
 
@@ -193,8 +195,11 @@ class StrumentiController extends ActionController {
     }
 
     public function Move($pa_values = NULL, $pa_options = NULL) {
-        $this->saveChildren(json_decode($_POST['data']));
+         $transazione = new Transaction($this->o_db, MYSQLI_TRANS_START_WITH_CONSISTENT_SNAPSHOT);
+        $this->runTransaction($transazione, false, true, false);
+        $this->saveChildren($_POST['data']);
         $this->saveTrans();
+        $transazione->rollback();
     }
 
     public function Elim($pa_values = NULL, $pa_options = NULL) {
@@ -207,6 +212,7 @@ class StrumentiController extends ActionController {
 
     public function Paste($pa_values = NULL, $pa_options = NULL) {
         $ok = false;
+        $node = null;
         if (isset($_POST['parent']) && $_POST['parent'] != "") {
             $parent = $_POST['parent'];
             $ok = true;
@@ -219,8 +225,7 @@ class StrumentiController extends ActionController {
 
         if ($ok) {
             // Recupero la posizione dell'ultimo figlio di $parent
-            $maxChild = 1;
-            $maxChild = "SELECT MAX(ordine) as 'max' FROM ca_objects WHERE parent_id = " + $parent;
+            $maxChild = "SELECT MAX(ordine) as 'max' FROM ca_objects WHERE parent_id = " . $parent;
             $qr_result = $this->o_db->query($maxChild);
             if ($qr_result && $qr_result->numRows() > 0) {
                 while ($qr_result->nextRow()) {
@@ -240,9 +245,8 @@ class StrumentiController extends ActionController {
     }
 
     public function Inventary($pa_values = NULL, $pa_options = NULL)    {
-        $error = null;
         if (!isset($_POST) || $_POST['_formName'] != 'caInventary') {
-            $error = "Informazioni del form sbagliato";
+            return;
         } else {
             if (!isset($_POST['object']))    {
                 $error = "Non è stato selezionato nussun elemento";
@@ -254,12 +258,12 @@ class StrumentiController extends ActionController {
 
                 $computate = array();
                 foreach ($_POST as $key => $screen_id)  {
+
                     if ($screen_id != "") {
                         $obj_type = explode("#", $key);
                         $computate[str_replace("_", " ", $obj_type[1])] = $screen_id;
                     }
                 }
-
 
                 $transazione = new Transaction($this->o_db, MYSQLI_TRANS_START_WITH_CONSISTENT_SNAPSHOT);
                 $this->runTransaction($transazione, false, true, true);
@@ -273,7 +277,7 @@ class StrumentiController extends ActionController {
                 header('Expires: 0');
                 header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
                 header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-                header('Content-Disposition: attachment; filename='. basename($file) .';');
+                header('Content-Disposition: attachment; filename='. preg_replace('/[^a-zA-Z0-9\-\._]/','', basename($file)));
                 header('Content-Transfer-Encoding: binary');
                 header('Content-Length: '.filesize($file));
 
@@ -294,8 +298,8 @@ class StrumentiController extends ActionController {
                 $keys = array_keys($options);
                 foreach ($menu as &$types)   {
                     for ($i = 0; $i < count($types); $i++) {
-                       // $type_key = str_replace(" ", "_", $types[array_keys($types)[$i]]['name']);
-			$type_key = $types[array_keys($types)[$i]]['name'];
+                        // $type_key = str_replace(" ", "_", $types[array_keys($types)[$i]]['name']);
+                        $type_key =$types[array_keys($types)[$i]]['name'];
                         if (!in_array($type_key, $keys)) {
                             array_splice($types, $i, 1);
                             $i--;
@@ -323,14 +327,15 @@ class StrumentiController extends ActionController {
                 require_once(__CA_APP_DIR__ . '/plugins/strumenti/tools/Ordinatore/Ordinatore.php');
                 $object_id = $options['object'];
                 unset($options['_formName'], $options['object'], $options['function']);
+
                 $toSort = array();
                 if (isset($options['TwoType'])) {
                     $toSort['all'] = $options['TwoType'];
                 } else {
                     foreach ($options as $type => $opt) {
                         if (substr( $type, -5 ) == "3Type") {
-    //                        $toSort[str_replace("_", " ", substr( $type, 0, -5 ))] = $opt;
-			      $toSort[substr( $type, 0, -5 )] = $opt;
+                            // $toSort[str_replace("_", " ", substr( $type, 0, -5 ))] = $opt;
+                            $toSort[substr( $type, 0, -5 )] = $opt;
                         } else {
                             if (is_array($opt)) {
                                 $toSort[$type] = $opt;
@@ -338,7 +343,11 @@ class StrumentiController extends ActionController {
                         }
                     }
                 }
-                $ordinatore = new Ordinatore($toSort);
+                $desc = false;
+                if (isset($options['decrescente'])) {
+                    $desc = true;
+                }
+                $ordinatore = new Ordinatore($toSort, $desc);
                 $changeItem = $ordinatore->run($object_id, $toSort);
                 foreach ($changeItem as $id => $item)   {
                     $this->transiction['UPDATE'][$id]['intr'] = $item;
@@ -368,7 +377,7 @@ class StrumentiController extends ActionController {
                 $params[str_replace("_", " ", $key)] = $value;
             }
 
-            $rinumeratore = new Rinumeratore($params);
+            $rinumeratore = new Rinumeratore($params, $this->user);
 
             $changeItem = $rinumeratore->run($idPartenza, $numeroPartenza, $prefisso, $type);
             foreach ($changeItem as $id => $item)   {
@@ -389,9 +398,15 @@ class StrumentiController extends ActionController {
                 'fine' => "-999999999999999",
                 'tipologia' => array()
             );
-            $accumulatore = $this->rifinisciRicorsiva($id, $accumulatore, $id);
+            $mapRank = array();
+            $list_id = $this->opo_config->get('object_type_list_id');
+            $qr_result = $this->o_db->query("SELECT idno, rank FROM ca_list_items WHERE list_id = {$list_id}");
+            while ($qr_result->nextRow()) {
+                $mapRank[$qr_result->get('idno')] = intval($qr_result->get('rank'));
+            }
+            $accumulatore = $this->rifinisciRicorsiva($id, $accumulatore, $mapRank);
 
-            echo $this->formatAccumulatore($id, $accumulatore);
+            echo $this->formatAccumulatore($id, $accumulatore, false);
         }
     }
 
@@ -400,6 +415,8 @@ class StrumentiController extends ActionController {
         $transazione = new Transaction($this->o_db, MYSQLI_TRANS_START_WITH_CONSISTENT_SNAPSHOT);
         $this->runTransaction($transazione, false, true, true);
         $transazione->commitTransaction();
+
+        $this->afterSave();
 
         // Resetto la transazione
         $this->transiction = null;
@@ -450,14 +467,57 @@ class StrumentiController extends ActionController {
     }
 
     private function saveChildren($children, $parent_id = null) {
-        $o_db = $this->o_db;
-        foreach ($children as $posizione => $nodo) {
-            $id = $nodo->id;
-            $this->transiction['UPDATE'][$id]['intr'] = array('parent_id' => $parent_id, 'ordine' => $posizione + 1);
-            if (isset($nodo->children)) {
-                $this->saveChildren($nodo->children, $id);
+                $new_parent = $children['parent'] == '#' ? 'NULL' : $children['parent'];
+        $posizione = $children['position'] -1;
+        $object_id = $children['id'];
+        $limit = (intval($posizione) < 0) ? 1 : 2;
+        $skip = (intval($posizione) < 0) ? 0 : $posizione;
+
+        $query = "SELECT ordine FROM ca_objects WHERE deleted = 0 AND ordine IS NOT NULL AND parent_id ";
+        $query .= ($new_parent) ? "= {$new_parent} " : "IS NULL ";
+        $query .= "ORDER BY ordine LIMIT {$skip}, {$limit}";
+        $result = $this->o_db->query($query );
+
+        $max = $this->o_db->query("SELECT COUNT(*) as 'm' FROM ca_objects WHERE deleted = 0 AND parent_id = {$new_parent}");
+        if ($max->nextRow()) {
+            $max = $max->get('m');
+        }
+        $a = null;
+        $b = null;
+        $ordine = null;
+
+        if ($posizione >= 0 && $result->nextRow()) {
+            $a = $result->get('ordine');
+            $a_fraction = $a - floor( $a );
+        }
+
+        if ($result->nextRow()) {
+            $b = $result->get('ordine');
+            $b_fraction = $b - floor( $b );
+        }
+
+        if ($children['position'] >= $max -1) {
+            $a = $b;
+            $a_fraction = $b_fraction;
+            $b = null;
+        }
+
+        if (!$b) { $ordine = $a +1; }
+        else {
+            $differenza = $b_fraction - $a_fraction;
+            if ( $differenza > 0 ) {
+                $ordine = floatval( floor( $b ) . "." . ( $differenza - 1 ) );
+            } else {
+                if (strpos($a, '.') === false) {
+                    $ordine = floatval( $a . ".9" );
+                } else {
+                    $ordine = floatval( $a . "9" );
+                }
+
             }
         }
+
+        $this->transiction['UPDATE'][$object_id]['intr'] = array('parent_id' => $new_parent, 'ordine' => $ordine);
     }
 
     protected function saveTrans() {
@@ -491,16 +551,18 @@ class StrumentiController extends ActionController {
                         $object->replaceAttribute(array($map['consistenza'] => $info['attr']['consistenza']), $map['consistenza']);
                     }
                     if (isset($info['attr']['numero_def'])) {
-                        $object->replaceAttribute(array($map['numero_dev'] => $info['attr']['numero_def']), $map['num_def']);
+                        $object->removeAttributes($map['num_def']);
+                        $object->addAttribute(array($map['numero_dev'] => $info['attr']['numero_def']), $map['num_def']);
                     }
                     if (isset($info['attr']['data']))  {
-                        $object->replaceAttribute(array($map['datadisplay'] => $info['attr']['data']['date_display'], $map['datarange'] => $info['attr']['data']['data_range'], $map['notedata'] => "Datazione calcolata"), $map['data']);
+                        $object->addAttribute(array($map['datadisplay'] => $info['attr']['data']['date_display'], $map['datarange'] => $info['attr']['data']['data_range'], $map['notedata'] => "Datazione calcolata"), $map['data']);
                     }
                 }
 
                 $object->setMode(ACCESS_WRITE);
                 $object->update();
             }
+            // die;
         }
 
         // Elimino oggetti
@@ -515,7 +577,7 @@ class StrumentiController extends ActionController {
         }
     }
 
-    private function rifinisciRicorsiva($id, $accumulatore, $root) {
+    private function rifinisciRicorsiva($id, $accumulatore, $mapRank = array()) {
         $object = new ca_objects($id);
         if ($object == null) {
             return $accumulatore;
@@ -525,64 +587,94 @@ class StrumentiController extends ActionController {
 
         // Qui dovrei aver accumulato tutte le informazioni dei figli
         foreach ($children as $child) {
-            $accumulatore = $this->rifinisciRicorsiva($child, $accumulatore, $root);
+            $accumulatore = $this->rifinisciRicorsiva($child, $accumulatore, $mapRank);
         }
 
-        if ($id != $root)   {
-            // Recupero le informazioni dell'oggetto
-            $map = $this->opo_config->get('mappatura_metadati');
-            $tipologia = $object->getTypeName();
-            if ($tipologia != null && $tipologia != "" && $tipologia != " = ") {
-                if (isset($accumulatore['tipologia'][$tipologia])) {
-                    $accumulatore['tipologia'][$tipologia]++;
-                } else {
-                    $accumulatore['tipologia'][$tipologia] = 1;
-                }
-            }
-
-            // if ($dataRange != null && $dataRange != "") {
-            //     $timepars = new TimeExpressionParser();
-            //     $tmp = explode("#", $dataRange);
-            //     $parse = $timepars->parseDate($tmp[0]);
-
-            //     $inizio = $parse['start'];
-            //     $fine = $parse['end'];
-
-            //     if ((int)$accumulatore['inizio'] > (int)$inizio) {
-            //         $accumulatore['inizio'] = $inizio;
-            //     }
-            //     if ((int)$accumulatore['fine'] < (int)$fine) {
-            //         $accumulatore['fine'] = $fine;
-            //     }
-            // }
-        }
-        
         if (count($children) > 0)   {
             $this->formatAccumulatore($id, $accumulatore);
+        }
+
+        // Recupero le informazioni dell'oggetto
+        $map = $this->opo_config->get('mappatura_metadati');
+        $tipologia = $object->getTypeName();
+        $tipologia_code = $object->getTypeCode();
+        $dataRange = $object->get($map['data'], array("delimiter" => '#','template' => '^ca_objects.cronologia.datazione'));
+
+        if ($tipologia != null && $tipologia != "" && $tipologia != " = ") {
+            if (isset($accumulatore['tipologia'][$tipologia])) {
+                $accumulatore['tipologia'][$tipologia]['count'] ++;
+            } else {
+                $accumulatore['tipologia'][$tipologia]['rank'] = $mapRank[$tipologia_code];
+                $accumulatore['tipologia'][$tipologia]['count'] = 1;
+            }
+        }
+
+        if ($dataRange != null && $dataRange != "") {
+            $timepars = new TimeExpressionParser();
+            $tmp = explode("#", $dataRange);
+            $parse = $timepars->parseDate($tmp[0]);
+
+            $inizio = $parse['start'];
+            $fine = $parse['end'];
+
+            if ((int)$accumulatore['inizio'] > (int)$inizio) {
+                $accumulatore['inizio'] = $inizio;
+            }
+            if ((int)$accumulatore['fine'] < (int)$fine) {
+                $accumulatore['fine'] = $fine;
+            }
         }
 
         return $accumulatore;
     }
 
-    private function formatAccumulatore($id, $accumulatore)  {
+    private function formatAccumulatore($id, $accumulatore, $flag = true)  {
         $consistenza = "";
-        foreach ($accumulatore['tipologia'] as $tipo => $count) {
-            $consistenza .= $tipo . ": " . $count . ", ";
-        }
-        $this->transiction['UPDATE'][$id]['attr']['consistenza'] = $consistenza;
-	$this->saveTrans();
-        // $data = new TimeExpressionParser($accumulatore['inizio'] . " - " . $accumulatore['fine']);
-        // $testo = $data->getText();
-        // if ($testo == "")   {
-        //     $this->saveTrans();
-        //     return "<p><b>Consistenza:</b> " . $consistenza . "</p>";
-        // } else {
-        //     $this->transiction['UPDATE'][$id]['attr']['data']['date_display'] = $testo;
-        //     $this->transiction['UPDATE'][$id]['attr']['data']['data_range'] = $testo;
-        //     $this->saveTrans();
-        // }
+        // var_dump(array_keys($accumulatore['tipologia']));
+        uasort($accumulatore['tipologia'], function ($a, $b) {
+            if ($a['rank'] == $b['rank']) {
+                return 0;
+            }
+            return ($a['rank'] < $b['rank']) ? -1 : 1;
+        });
 
-        // return "<p><b>Consistenza:</b> " . $consistenza . "</p><p><b>Estremi cronologici:</b> " . $testo ."</p>";
-        return "<p><b>Consistenza:</b> " . $consistenza . "</p>";
+        // var_dump(array_keys($accumulatore['tipologia']));
+        foreach ($accumulatore['tipologia'] as $tipo => $count) {
+            $consistenza .= $tipo . ": " . $count['count'] . ", ";
+        }
+        if ($flag) {
+            $this->transiction['UPDATE'][$id]['attr']['consistenza'] = $consistenza;
+        }
+
+        $data = new TimeExpressionParser($accumulatore['inizio'] . " - " . $accumulatore['fine']);
+        $testo = $data->getText();
+        if ($testo == "")   {
+            if ($flag) {
+                $this->saveTrans();
+            }
+            return "<p><b>Consistenza:</b> " . $consistenza . "</p>";
+        } else {
+            if ($flag) {
+                $this->transiction['UPDATE'][$id]['attr']['data']['date_display'] = $testo;
+                $this->transiction['UPDATE'][$id]['attr']['data']['data_range'] = $testo;
+                $this->saveTrans();
+            }
+        }
+
+        return "<p><b>Consistenza:</b> " . $consistenza . "</p><p><b>Estremi cronologici:</b> " . $testo ."</p>";
+    }
+
+    private function afterSave() {
+        $aggiornamenti = $this->transiction['UPDATE'];
+        foreach ($aggiornamenti as $id => $info) {
+            $object = new ca_objects($id);
+            $this->opo_app_plugin_manager->hookSaveItem(array('id' => $id, 'table_num' => 57, 'table_name' => "ca_objects", 'instance' => $object, 'is_insert' => false, 'strumenti' => true));
+        }
+
+        $cancellati = $this->transiction['DELETE'];
+        foreach ($cancellati as $id) {
+            $object = new ca_objects($id);
+            $this->opo_app_plugin_manager->hookDeleteItem(array('id' => $id, 'table_num' => 57, 'table_name' => "ca_objects", 'instance' => $object));
+        }
     }
 }

@@ -10,15 +10,26 @@ $ajax_path = $this->getVar( 'root' ) . 'strumenti/Strumenti';
 ?>
 <script>
 (function($)  {
-
+    var otheraction = false;
     window.onbeforeunload = function(){
         if (!disableExitControl) {
-            return 'You sure you want to leave?';
+            if (navigator.userAgent.search("Firefox") < 0) {
+                jQuery.get("<?php echo $ajax_path ?>/Leave");
+                return 'You sure you want to leave?';
+            } else {
+                return 'Si consiglia di utilizzare Chrome';
+            }
         }
     };
-    // window.onunload = function() {
-    //     jQuery.get("<?php echo $ajax_path ?>/Leave");
-    // }
+    window.onunload = function() {
+        if (!disableExitControl) {
+            if (navigator.userAgent.search("Firefox") < 0) {
+                jQuery.get("<?php echo $ajax_path ?>/Leave");
+            } else {
+                alert('Si consiglia di utilizzare Chrome');
+            }
+        }
+    }
 
     $('#leftNavSidebar').html(`
         <div id="infoSelezionati">
@@ -130,6 +141,7 @@ $ajax_path = $this->getVar( 'root' ) . 'strumenti/Strumenti';
         $('.modal-backdrop').show();
 
         $('#modal-ordinatore .Formobject_id').val(archiuitree.jstree().get_selected());
+        disableExitControl = true;
     });
 
     $('#btnRinumera').click(function (e)    {
@@ -137,6 +149,7 @@ $ajax_path = $this->getVar( 'root' ) . 'strumenti/Strumenti';
         $('.modal-backdrop').show();
 
         $('#modal-rinumera .Formobject_id').val(archiuitree.jstree().get_selected());
+        disableExitControl = true;
     });
 
     $('#btnRifinisci').click(function (e) {
@@ -168,6 +181,9 @@ $ajax_path = $this->getVar( 'root' ) . 'strumenti/Strumenti';
     $('#btnSalva').click(function (e) {
         if (confirm("Le modifiche saranno permanenti. Continuare?"))  {
             $.get("<?php echo $ajax_path; ?>/Save").done(function () {
+                $('#btnSalva .fa')
+                    .addClass('fa-check-circle-o')
+                    .removeClass('fa-spinner fa-pulse fa-fw');
                 jQuery.notify({
                         icon: "fa fa-floppy-o",
                         message: "Modifiche salvate"
@@ -188,8 +204,11 @@ $ajax_path = $this->getVar( 'root' ) . 'strumenti/Strumenti';
                         '<span data-notify="message">{2}</span>' +
                         '</div></div>'
                 });
-
+                disableExitControl = false;
             });
+            $(this).find('.fa')
+                .removeClass('fa-check-circle-o')
+                .addClass('fa-spinner fa-pulse fa-fw');
         }
     });
 

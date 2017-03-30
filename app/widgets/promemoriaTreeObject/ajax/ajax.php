@@ -192,6 +192,34 @@ switch ( $operation ) {
                 case 2565:
                     $icon = 'fa fa-clone icon-color';
                 break;
+                case 2862:
+                case 2643:
+                    $icon = 'fa fa-building-o icon-color';
+                break;
+                case 2865:
+                case 2645:
+                    $icon = 'fa fa-tree icon-color';
+                break;
+                case 2858:
+                    $icon = 'fa fa-th icon-color';
+                break;
+                case 2863:
+                case 2849:
+                    $icon = 'fa fa-paint-brush icon-color';
+                break;
+                case 2864:
+                case 2854:
+                    $icon = 'fa fa-magnet icon-color';
+                break;
+                case 2868:
+                    $icon = 'fa fa-diamont icon-color';
+                break;
+                case 2866:
+                    $icon = 'fa fa-eraser icon-color';
+                break;
+                case 2867:
+                    $icon = 'fa fa-microphone icon-color';
+                break;
             }
 
             $nodo->icon = $icon;
@@ -263,7 +291,7 @@ switch ( $operation ) {
                         break;
                     case 'num_def_numero':
                         $attr_num_def = $o_db->query("SELECT v.value_longtext1 as 'value' FROM ca_attribute_values v INNER JOIN ca_attributes a ON (a.attribute_id = v.attribute_id) WHERE v.element_id = 1133 AND a.table_num = 57 AND a.row_id = {$objectId}");
-                        if ($attr_num_def->nextRow())  {
+                        if ($attr_num_def && $attr_num_def->nextRow())  {
                             $num_def = $attr_num_def->get('value');
                         }
                         if ($num_def != "")   {
