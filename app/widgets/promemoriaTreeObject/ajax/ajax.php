@@ -417,12 +417,16 @@ switch ( $operation ) {
 
             // Scelta dell'icona
             switch($type) {
+                case 23:
+                case 24:
+                case 25:
+                case 26:
                 case 186:
-                    $icon = 'fa fa-archive icon-color';
-                break;
                 case 189:
                 case 187:
                 case 188:
+                case 190:
+                case 191:
                 case 192:
                     $icon = 'fa fa-archive icon-color';
                 break;
@@ -477,6 +481,42 @@ switch ( $operation ) {
                 break;
                 case 280:
                     $icon = 'fa fa-folder icon-color';
+                break;
+                case 4130:
+                    $icon = 'fa fa-building-o';
+                break;
+                case 4133:
+                    $icon = 'fa fa-tree';
+                break;
+                case 4129:
+                    $icon = 'fa fa-th';
+                break;
+                case 4131:
+                    $icon = 'fa fa-paint-brush';
+                break;
+                case 4132:
+                    $icon = 'fa fa-magnet';
+                break;
+                case 4134:
+                    $icon = 'fa fa-diamont';
+                break;
+                case 4135:
+                    $icon = 'fa fa-building-o icon-color';
+                break;
+                case 4136:
+                    $icon = 'fa fa-tree icon-color';
+                break;
+                case 4137:
+                    $icon = 'fa fa-paint-brush icon-color';
+                break;
+                case 4138:
+                    $icon = 'fa fa-magnet icon-color';
+                break;
+                case 4139:
+                    $icon = 'fa fa-eraser icon-color';
+                break;
+                case 4140:
+                    $icon = 'fa fa-microphone icon-color';
                 break;
             }
 
