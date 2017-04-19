@@ -128,97 +128,79 @@ switch ( $operation ) {
 
             // Scelta dell'icona
             switch($type) {
+                case 23:
+                case 24:
+                case 25:
+                case 26:
                 case 186:
-                    $icon = 'fa fa-archive icon-color';
+                 $icon = 'fa fa-archive icon-color';
                 break;
                 case 189:
                 case 187:
                 case 188:
+                case 190:
+                case 191:
                 case 192:
-                    $icon = 'fa fa-archive icon-color';
+                  $icon = 'fa fa-archive icon-color';
                 break;
-                case 286:
-                    $icon = 'fa fa-camera';
-                break;
-                case 287:
-                    $icon = 'fa fa-file-image-o';
-                break;
-                case 288:
-                    $icon = 'fa fa-pencil-square-o';
-                break;
-                case 289:
-                    $icon = 'fa fa-cubes';
-                break;
-                case 368:
-                case 1880:
-                    $icon = 'fa fa-music';
-                break;
-                case 370:
-                case 1881:
-                case 2021:
-                    $icon = 'fa fa-video-camera';
-                break;
-                case 369:
-                case 1882:
-                    $icon = 'fa fa-picture-o';
-                break;
-                case 291:
-                    $icon = 'fa fa-book';
-                break;
-                case 1964:
-                    $icon = 'fa fa-file-text';
+                 $icon = 'fa fa-file-text';
                 break;
                 case 281:
-                    $icon = 'fa fa-camera icon-color';
+                 $icon = 'fa fa-camera icon-color';
                 break;
                 case 282:
-                    $icon = 'fa fa-cubes icon-color';
+                 $icon = 'fa fa-cubes icon-color';
                 break;
                 case 283:
-                    $icon = 'fa fa-camera-retro';
+                 $icon = 'fa fa-camera-retro';
                 break;
                 case 284:
-                    $icon = 'fa fa-file-image-o icon-color';
+                 $icon = 'fa fa-file-image-o icon-color';
                 break;
                 case 285:
-                    $icon = 'fa fa-pencil-square-o icon-color';
+                 $icon = 'fa fa-pencil-square-o icon-color';
                 break;
                 case 2020:
-                    $icon = 'fa fa-video-camera icon-color';
+                 $icon = 'fa fa-video-camera icon-color';
                 break;
                 case 280:
-                    $icon = 'fa fa-folder icon-color';
+                  $icon = 'fa fa-folder icon-color';
                 break;
-                case 2565:
-                    $icon = 'fa fa-clone icon-color';
+                case 4130:
+                 $icon = 'fa fa-building-o';
                 break;
-                case 2862:
-                case 2643:
-                    $icon = 'fa fa-building-o icon-color';
+                case 4133:
+                 $icon = 'fa fa-tree';
                 break;
-                case 2865:
-                case 2645:
-                    $icon = 'fa fa-tree icon-color';
+                case 4129:
+                 $icon = 'fa fa-th';
                 break;
-                case 2858:
-                    $icon = 'fa fa-th icon-color';
+                case 4131:
+                 $icon = 'fa fa-paint-brush';
                 break;
-                case 2863:
-                case 2849:
-                    $icon = 'fa fa-paint-brush icon-color';
+                case 4132:
+                 $icon = 'fa fa-magnet';
                 break;
-                case 2864:
-                case 2854:
-                    $icon = 'fa fa-magnet icon-color';
+                case 4134:
+                 $icon = 'fa fa-diamont';
                 break;
-                case 2868:
-                    $icon = 'fa fa-diamont icon-color';
+                case 4135:
+                 $icon = 'fa fa-building-o icon-color';
                 break;
-                case 2866:
-                    $icon = 'fa fa-eraser icon-color';
+                case 4136:
+                 $icon = 'fa fa-tree icon-color';
                 break;
-                case 2867:
-                    $icon = 'fa fa-microphone icon-color';
+                case 4137:
+                 $icon = 'fa fa-paint-brush icon-color';
+                break;
+                case 4138:
+                 $icon = 'fa fa-magnet icon-color';
+                break;
+                case 4139:
+                 $icon = 'fa fa-eraser icon-color';
+                break;
+                case 4140:
+                 $icon = 'fa fa-microphone icon-color';
                 break;
             }
 
